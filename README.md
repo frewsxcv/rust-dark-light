@@ -2,6 +2,8 @@
 
 Rust crate to detect if dark mode or light mode is enabled.
 
+[API Documentation](https://docs.rs/dark-light/)
+
 ## Usage
 
 ```rust
