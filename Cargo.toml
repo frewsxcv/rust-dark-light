@@ -1,5 +1,5 @@
 [package]
-name = "rust-dark-light"
+name = "dark-light"
 version = "0.1.0"
 authors = ["Corey Farwell <coreyf@rwell.org>"]
 edition = "2018"
