@@ -28,7 +28,7 @@ mod linux;
 #[cfg(target_os = "linux")]
 use linux as platform;
 
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+#[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
 mod platform {
     pub fn detect() -> crate::Mode {
         Mode::Light
