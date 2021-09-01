@@ -12,3 +12,4 @@ readme = "README.md"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.8.0"
+detect-desktop-environment = "0.2.0"

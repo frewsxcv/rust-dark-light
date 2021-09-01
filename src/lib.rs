@@ -23,6 +23,11 @@ mod windows;
 #[cfg(target_os = "windows")]
 use windows as platform;
 
+#[cfg(target_os = "linux")]
+mod linux;
+#[cfg(target_os = "linux")]
+use linux as platform;
+
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 mod platform {
     pub fn detect() -> crate::Mode {
