@@ -20,11 +20,7 @@ fn is_dark_mode_enabled() -> bool {
 fn check_file(pattern: &str, path: &str) -> bool {
     if let Ok(content) = std::fs::read_to_string(path) {
         let theme = content.lines().filter(|line| line.contains(pattern)).collect::<String>();
-        if theme.to_lowercase().contains("dark") {
-            true
-        } else {
-            false
-        }
+        theme.to_lowercase().contains("dark")
     } else {
         false
     }
