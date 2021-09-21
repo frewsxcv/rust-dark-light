@@ -27,14 +27,9 @@ fn check_file(pattern: &str, path: &str) -> bool {
 }
 
 fn check_dconf(pattern: &str) -> bool {
-    let theme = match dconf_rs::get_string(pattern) {
-        Ok(theme) => theme,
-        Err(_) => String::new()
-    };
-    if theme.contains("dark") {
-        true
-    } else {
-        false
+    match dconf_rs::get_string(pattern) {
+        Ok(theme) => theme.contains("dark"),
+        Err(_) => false,
     }
 }
 
