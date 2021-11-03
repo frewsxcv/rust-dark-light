@@ -11,6 +11,7 @@ readme = "README.md"
 [target.'cfg(unix)'.dependencies]
 detect-desktop-environment = "0.2.0"
 dconf_rs = "0.3.0"
+dirs = "4.0.0"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.8.0"
