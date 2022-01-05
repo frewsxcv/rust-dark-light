@@ -1,24 +1,23 @@
 use winreg::RegKey;
+use crate::Mode;
+use anyhow::Result;
 
-fn is_dark_mode_enabled() -> bool {
+pub fn detect() -> Result<Mode> {
     let hkcu = RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
-    if let Ok(subkey) =
+    let mode = if let Ok(subkey) =
         hkcu.open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize")
     {
         if let Ok(dword) = subkey.get_value::<u32, _>("AppsUseLightTheme") {
-            (dword == 0)
+            if dword == 0 {
+                Mode::Dark
+            } else {
+                Mode::Light
+            }
         } else {
-            false
+            Mode::Light
         }
     } else {
-        false
-    }
-}
-
-pub fn detect() -> crate::Mode {
-    if is_dark_mode_enabled() {
-        crate::Mode::Dark
-    } else {
-        crate::Mode::Light
-    }
+        Mode::Light
+    };
+    Ok(mode)
 }

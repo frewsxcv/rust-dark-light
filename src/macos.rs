@@ -1,22 +1,21 @@
 use std::process;
+use crate::Mode;
+use anyhow::Result;
 
-fn is_dark_mode_enabled() -> bool {
-    if let Ok(output) = process::Command::new("defaults")
+pub fn detect() -> Result<Mode> {
+    let mode = if let Ok(output) = process::Command::new("defaults")
         .arg("read")
         .arg("-g")
         .arg("AppleInterfaceStyle")
         .output()
     {
-        output.stdout.starts_with(b"Dark")
+        if output.stdout.starts_with(b"Dark") {
+            Mode::Dark
+        } else {
+            Mode::Light
+        }
     } else {
-        false
-    }
-}
-
-pub fn detect() -> crate::Mode {
-    if is_dark_mode_enabled() {
-        crate::Mode::Dark
-    } else {
-        crate::Mode::Light
-    }
+        Mode::Light
+    };
+    Ok(mode)
 }

@@ -52,7 +52,7 @@ fn check_dconf(pattern: &str) -> Mode {
 }
 
 
-fn is_dark_mode_enabled() -> Result<crate::Mode> {
+pub fn detect() -> Result<crate::Mode> {
     let mode = if get_appearance()?.is_some() {
         get_appearance()?.unwrap()
     } else {
@@ -67,8 +67,4 @@ fn is_dark_mode_enabled() -> Result<crate::Mode> {
         }
     };
     Ok(mode)
-}
-
-pub fn detect() -> Result<crate::Mode> {
-    is_dark_mode_enabled()
 }
