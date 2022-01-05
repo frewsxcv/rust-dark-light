@@ -57,7 +57,6 @@ fn is_dark_mode_enabled() -> Result<crate::Mode> {
         get_appearance()?.unwrap()
     } else {
         match DesktopEnvironment::detect() {
-            DesktopEnvironment::Unknown => Mode::Light,
             DesktopEnvironment::Cinnamon => check_dconf("/org/cinnamon/desktop/interface/gtk-theme"),
             DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
             DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
