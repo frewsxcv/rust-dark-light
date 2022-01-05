@@ -1,6 +1,6 @@
-use winreg::RegKey;
 use crate::Mode;
 use anyhow::Result;
+use winreg::RegKey;
 
 pub fn detect() -> Result<Mode> {
     let hkcu = RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
