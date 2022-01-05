@@ -1,51 +1,22 @@
 use std::path::Path;
-use std::time::Duration;
-use dbus::arg;
 use detect_desktop_environment::DesktopEnvironment;
-use dbus::blocking::stdintf::org_freedesktop_dbus::Properties;
-use dbus::blocking::Connection;
 
-use anyhow::Result;
+use anyhow::{Result, Context};
+use zbus::{blocking::Connection};
+use zvariant::Value;
 
 use crate::Mode;
 
-fn is_dark_mode_enabled() -> Result<crate::Mode> {
-    let mode = if get_appearance().is_some() {
-        get_freedesktop_color_scheme()
-    } else {
-        match DesktopEnvironment::detect() {
-            DesktopEnvironment::Unknown => Mode::Light,
-            DesktopEnvironment::Cinnamon => check_dconf("/org/cinnamon/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
-            DesktopEnvironment::Mate => check_dconf("/org/mate/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Unity => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Xfce => check_config_file("name=\"ThemeName\"", "xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"),
-            _ => Mode::Light
-        }
-    };
-    Ok(mode)
-}
-
-fn get_freedesktop_color_scheme() -> Mode {
-    let appearance: Option<arg::PropMap> = get_appearance();
-    if appearance.is_none() { 
-        Mode::Light
-    } else {
-        let appearance = appearance.unwrap();
-        let theme: Option<&i32> = arg::prop_cast(&appearance, "color-scheme");
-        match theme.unwrap() {
-            1 => Mode::Dark,
-            _ => Mode::Light,
-        }
+fn get_appearance() -> Result<Option<Mode>> {
+    let conn = Connection::session()?;
+    let reply = conn.call_method(Some("org.freedesktop.portal.Desktop"), "/org/freedesktop/portal/desktop", Some("org.freedesktop.portal.Settings"), "Read", &("org.freedesktop.appearance", "color-scheme"))?;
+    let theme = reply.body::<Value>()?;
+    let theme = theme.downcast::<u32>().with_context(|| "Failed to parse value")?;
+    match theme {
+        0 | 2 => Ok(Some(Mode::Light)),
+        1 =>  Ok(Some(Mode::Dark)),
+        _ => Ok(None),
     }
-}
-
-fn get_appearance() -> Option<arg::PropMap> {
-    let conn = Connection::new_session().unwrap();
-    let proxy = conn.with_proxy("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop", Duration::from_millis(5000));
-    let data = proxy.get("org.freedesktop.portal.Settings", "org.freedesktop.appearance").ok();
-    data
 }
 
 fn check_file(pattern: &str, path: &Path) -> Mode {
@@ -78,6 +49,25 @@ fn check_dconf(pattern: &str) -> Mode {
         },
         Err(_) => Mode::Light,
     }
+}
+
+
+fn is_dark_mode_enabled() -> Result<crate::Mode> {
+    let mode = if get_appearance()?.is_some() {
+        get_appearance()?.unwrap()
+    } else {
+        match DesktopEnvironment::detect() {
+            DesktopEnvironment::Unknown => Mode::Light,
+            DesktopEnvironment::Cinnamon => check_dconf("/org/cinnamon/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
+            DesktopEnvironment::Mate => check_dconf("/org/mate/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Unity => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Xfce => check_config_file("name=\"ThemeName\"", "xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"),
+            _ => Mode::Light
+        }
+    };
+    Ok(mode)
 }
 
 pub fn detect() -> Result<crate::Mode> {

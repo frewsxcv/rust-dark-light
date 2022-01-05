@@ -15,7 +15,8 @@ anyhow = "1.0.52"
 detect-desktop-environment = "0.2.0"
 dconf_rs = "0.3.0"
 dirs = "4.0.0"
-dbus = "0.9.5"
+zbus = "2.0.0"
+zvariant = "3.0.0"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.8.0"
