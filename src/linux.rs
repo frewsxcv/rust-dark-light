@@ -7,7 +7,7 @@ use zvariant::Value;
 
 use crate::Mode;
 
-fn get_appearance() -> Result<Option<Mode>> {
+fn get_freedesktop_color_scheme() -> Result<Option<Mode>> {
     let conn = Connection::session()?;
     let reply = conn.call_method(Some("org.freedesktop.portal.Desktop"), "/org/freedesktop/portal/desktop", Some("org.freedesktop.portal.Settings"), "Read", &("org.freedesktop.appearance", "color-scheme"))?;
     let theme = reply.body::<Value>()?;
@@ -53,8 +53,8 @@ fn check_dconf(pattern: &str) -> Mode {
 
 
 pub fn detect() -> Result<crate::Mode> {
-    let mode = if get_appearance()?.is_some() {
-        get_appearance()?.unwrap()
+    let mode = if get_freedesktop_color_scheme()?.is_some() {
+        get_freedesktop_color_scheme()?.unwrap()
     } else {
         match DesktopEnvironment::detect() {
             DesktopEnvironment::Cinnamon => check_dconf("/org/cinnamon/desktop/interface/gtk-theme"),
