@@ -23,7 +23,8 @@ fn get_freedesktop_color_scheme() -> Result<Option<Mode>> {
             .with_context(|| "Failed to parse value")?;
         match theme {
             1 => Ok(Some(Mode::Dark)),
-            _ => Ok(Some(Mode::Light)),
+            2 => Ok(Some(Mode::Light)),
+            _ => Ok(None),
         }
     } else {
         return Ok(None);
