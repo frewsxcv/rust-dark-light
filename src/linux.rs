@@ -15,15 +15,18 @@ fn get_freedesktop_color_scheme() -> Result<Option<Mode>> {
         Some("org.freedesktop.portal.Settings"),
         "Read",
         &("org.freedesktop.appearance", "color-scheme"),
-    )?;
-    let theme = reply.body::<Value>()?;
-    let theme = theme
-        .downcast::<u32>()
-        .with_context(|| "Failed to parse value")?;
-    match theme {
-        0 | 2 => Ok(Some(Mode::Light)),
-        1 => Ok(Some(Mode::Dark)),
-        _ => Ok(None),
+    );
+    if let Ok(reply) = &reply {
+        let theme = reply.body::<Value>()?;
+        let theme = theme
+            .downcast::<u32>()
+            .with_context(|| "Failed to parse value")?;
+        match theme {
+            1 => Ok(Some(Mode::Dark)),
+            _ => Ok(Some(Mode::Light)),
+        }
+    } else {
+        return Ok(None);
     }
 }
 
@@ -33,11 +36,7 @@ fn check_file(pattern: &str, path: &Path) -> Mode {
             .lines()
             .filter(|line| line.contains(pattern))
             .collect::<String>();
-        if theme.to_lowercase().contains("dark") {
-            Mode::Dark
-        } else {
-            Mode::Light
-        }
+        Mode::from(theme.to_lowercase().contains("dark"))
     } else {
         Mode::Light
     }

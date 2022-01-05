@@ -8,11 +8,7 @@ pub fn detect() -> Result<Mode> {
         hkcu.open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize")
     {
         if let Ok(dword) = subkey.get_value::<u32, _>("AppsUseLightTheme") {
-            if dword == 0 {
-                Mode::Dark
-            } else {
-                Mode::Light
-            }
+            Mode::from(dword == 0)
         } else {
             Mode::Light
         }

@@ -43,6 +43,16 @@ pub enum Mode {
     Light,
 }
 
+impl Mode {
+    fn from(b: bool) -> Self {
+        if b {
+            Mode::Dark
+        } else {
+            Mode::Light
+        }
+    }
+}
+
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Light`].
 pub fn detect() -> Result<Mode> {
     platform::detect()

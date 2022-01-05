@@ -9,11 +9,7 @@ pub fn detect() -> Result<Mode> {
         .arg("AppleInterfaceStyle")
         .output()
     {
-        if output.stdout.starts_with(b"Dark") {
-            Mode::Dark
-        } else {
-            Mode::Light
-        }
+        Mode::from(output.stdout.starts_with(b"Dark"))
     } else {
         Mode::Light
     };
