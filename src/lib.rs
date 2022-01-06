@@ -23,7 +23,32 @@ mod windows;
 #[cfg(target_os = "windows")]
 use windows as platform;
 
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+#[cfg(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "dragonfly",
+    target_os = "netbsd",
+    target_os = "openbsd"
+))]
+mod freedesktop;
+#[cfg(any(
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "dragonfly",
+    target_os = "netbsd",
+    target_os = "openbsd"
+))]
+use freedesktop as platform;
+
+#[cfg(not(any(
+    target_os = "macos",
+    target_os = "windows",
+    target_os = "linux",
+    target_os = "freebsd",
+    target_os = "dragonfly",
+    target_os = "netbsd",
+    target_os = "openbsd"
+)))]
 mod platform {
     pub fn detect() -> crate::Mode {
         Mode::Light
