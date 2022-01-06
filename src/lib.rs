@@ -24,9 +24,9 @@ mod windows;
 use windows as platform;
 
 #[cfg(target_os = "linux")]
-mod linux;
+mod freedesktop;
 #[cfg(target_os = "linux")]
-use linux as platform;
+use freedesktop as platform;
 
 use anyhow::Result;
 
