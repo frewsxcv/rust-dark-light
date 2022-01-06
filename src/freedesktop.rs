@@ -20,7 +20,7 @@ fn get_freedesktop_color_scheme() -> Result<Option<Mode>> {
         let theme = reply.body::<Value>()?;
         let theme = theme
             .downcast::<u32>()
-            .with_context(|| "Failed to parse value")?;
+            .with_context(|| "Failed to parse return value from dbus call to org.freedesktop.appearance color-scheme")?;
         match theme {
             1 => Ok(Some(Mode::Dark)),
             2 => Ok(Some(Mode::Light)),
