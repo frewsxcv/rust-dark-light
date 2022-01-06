@@ -1,9 +1,8 @@
 use crate::Mode;
-use anyhow::Result;
 use std::process;
 
-pub fn detect() -> Result<Mode> {
-    let mode = if let Ok(output) = process::Command::new("defaults")
+pub fn detect() -> Mode {
+    if let Ok(output) = process::Command::new("defaults")
         .arg("read")
         .arg("-g")
         .arg("AppleInterfaceStyle")
@@ -12,6 +11,5 @@ pub fn detect() -> Result<Mode> {
         Mode::from(output.stdout.starts_with(b"Dark"))
     } else {
         Mode::Light
-    };
-    Ok(mode)
+    }
 }

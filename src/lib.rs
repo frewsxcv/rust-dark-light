@@ -28,8 +28,6 @@ mod freedesktop;
 #[cfg(target_os = "linux")]
 use freedesktop as platform;
 
-use anyhow::Result;
-
 #[cfg(not(any(target_os = "macos", target_os = "windows", target_os = "linux")))]
 mod platform {
     pub fn detect() -> crate::Mode {
@@ -54,6 +52,6 @@ impl Mode {
 }
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Light`].
-pub fn detect() -> Result<Mode> {
+pub fn detect() -> Mode {
     platform::detect()
 }
