@@ -54,7 +54,7 @@ fn check_config_file(pattern: &str, path: &str) -> Mode {
 fn check_dconf(pattern: &str) -> Mode {
     match dconf_rs::get_string(pattern) {
         Ok(theme) => {
-            if theme.contains("dark") {
+            if theme.to_lowercase().contains("dark") {
                 Mode::Dark
             } else {
                 Mode::Light
