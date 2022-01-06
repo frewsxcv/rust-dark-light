@@ -64,23 +64,27 @@ fn check_dconf(pattern: &str) -> Mode {
     }
 }
 
-pub fn detect() -> Result<crate::Mode> {
-    let mode = match get_freedesktop_color_scheme()? {
-        Some(mode) => mode,
-        None => match DesktopEnvironment::detect() {
-            DesktopEnvironment::Cinnamon => {
-                check_dconf("/org/cinnamon/desktop/interface/gtk-theme")
+pub fn detect() -> Mode {
+    match get_freedesktop_color_scheme() {
+        Ok(mode) => {
+            match mode {
+                Some(mode) => mode,
+                None => match DesktopEnvironment::detect() {
+                    DesktopEnvironment::Cinnamon => {
+                        check_dconf("/org/cinnamon/desktop/interface/gtk-theme")
+                    }
+                    DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
+                    DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
+                    DesktopEnvironment::Mate => check_dconf("/org/mate/desktop/interface/gtk-theme"),
+                    DesktopEnvironment::Unity => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
+                    DesktopEnvironment::Xfce => check_config_file(
+                        "name=\"ThemeName\"",
+                        "xfce4/xfconf/xfce-perchannel-xml/xsettings.xml",
+                    ),
+                    _ => Mode::Light,
+                },
             }
-            DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
-            DesktopEnvironment::Mate => check_dconf("/org/mate/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Unity => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Xfce => check_config_file(
-                "name=\"ThemeName\"",
-                "xfce4/xfconf/xfce-perchannel-xml/xsettings.xml",
-            ),
-            _ => Mode::Light,
         },
-    };
-    Ok(mode)
+        Err(_) => Mode::Light
+    }
 }
