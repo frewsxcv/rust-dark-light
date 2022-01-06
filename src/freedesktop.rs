@@ -70,6 +70,7 @@ fn check_dconf(pattern: &str) -> Mode {
 pub fn detect() -> Mode {
     match get_freedesktop_color_scheme() {
         Some(mode) => mode,
+        // Other desktop environments are still being worked on, fow now, only the following implementations work.
         None => match DesktopEnvironment::detect() {
             DesktopEnvironment::Cinnamon => {
                 check_dconf("/org/cinnamon/desktop/interface/gtk-theme")

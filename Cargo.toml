@@ -8,9 +8,6 @@ repository = "https://github.com/frewsxcv/rust-dark-light"
 description = "Detect if dark mode or light mode is enabled"
 readme = "README.md"
 
-[dependencies]
-anyhow = "1.0.52"
-
 [target.'cfg(unix)'.dependencies]
 detect-desktop-environment = "0.2.0"
 dconf_rs = "0.3.0"
