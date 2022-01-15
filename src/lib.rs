@@ -26,7 +26,7 @@ use windows as platform;
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 mod platform {
     pub fn detect() -> crate::Mode {
-        Mode::Light
+        super::Mode::Light
     }
 }
 
