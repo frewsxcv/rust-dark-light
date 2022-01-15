@@ -1,8 +1,6 @@
 use detect_desktop_environment::DesktopEnvironment;
 use std::path::{Path, PathBuf};
-
-use simple_config_parser::Config;
-
+use ini::Ini;
 use zbus::blocking::Connection;
 use zvariant::Value;
 
@@ -46,30 +44,31 @@ fn detect_gtk(pattern: &str) -> Mode {
 }
 
 fn detect_kde(path: &str) -> Mode {
-    match Config::new().file(path) {
-        Ok(cfg) => {
-            let rgb: Vec<u32> = match cfg.get_str("BackgroundNormal") {
-                Ok(values) => {
-                    let rgb = values
-                        .split(',')
-                        .map(|s| s.parse::<u32>().unwrap_or(255))
-                        .collect::<Vec<u32>>();
-                    if rgb.len() > 2 {
-                        rgb
-                    } else {
-                        vec![255, 255, 255]
-                    }
-                }
-                Err(_) => vec![255, 255, 255],
+    let cfg = match Ini::load_from_file(path) {
+        Ok (cfg) => {
+            let section = cfg.section(Some("Colors:Window")).unwrap();
+            let values = match section.get("BackgroundNormal") {
+                Some(string) => string,
+                None => return Mode::Light,
+            };
+            let rgb = values
+                .split(',')
+                .map(|s| s.parse::<u32>().unwrap_or(255))
+                .collect::<Vec<u32>>();
+            let rgb = if rgb.len() > 2 {
+                rgb
+            } else {
+                vec![255, 255, 255]
             };
             let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
             Mode::rgb(r, g, b)
-        }
-        Err(err) => {
-            eprintln!("{:?}", err);
+        },
+        Err(e) => {
+            eprintln!("{:?}", e);
             Mode::Light
-        }
-    }
+        },
+    };
+    cfg
 }
 
 pub fn detect() -> Mode {
