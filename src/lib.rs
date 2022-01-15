@@ -3,14 +3,12 @@
 //! # Examples
 //!
 //! ```
-//! fn main() {
-//!     let mode = dark_light::detect();
+//!let mode = dark_light::detect();//!
 //!
-//!     match mode {
-//!         dark_light::Mode::Dark => {},
-//!         dark_light::Mode::Light => {},
-//!     }
-//! }
+//!match mode {
+//!    dark_light::Mode::Dark => {},
+//!    dark_light::Mode::Light => {},
+//!}
 //! ```
 
 #[cfg(target_os = "macos")]

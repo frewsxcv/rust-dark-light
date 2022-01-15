@@ -1,6 +1,6 @@
 use detect_desktop_environment::DesktopEnvironment;
-use std::path::{Path, PathBuf};
 use ini::Ini;
+use std::path::{Path, PathBuf};
 use zbus::blocking::Connection;
 use zvariant::Value;
 
@@ -44,9 +44,12 @@ fn detect_gtk(pattern: &str) -> Mode {
 }
 
 fn detect_kde(path: &str) -> Mode {
-    let cfg = match Ini::load_from_file(path) {
-        Ok (cfg) => {
-            let section = cfg.section(Some("Colors:Window")).unwrap();
+    match Ini::load_from_file(path) {
+        Ok(cfg) => {
+            let section = match cfg.section(Some("Colors:Window")) {
+                Some(section) => section,
+                None => return Mode::Light,
+            };
             let values = match section.get("BackgroundNormal") {
                 Some(string) => string,
                 None => return Mode::Light,
@@ -62,13 +65,12 @@ fn detect_kde(path: &str) -> Mode {
             };
             let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
             Mode::rgb(r, g, b)
-        },
+        }
         Err(e) => {
             eprintln!("{:?}", e);
             Mode::Light
-        },
-    };
-    cfg
+        }
+    }
 }
 
 pub fn detect() -> Mode {
