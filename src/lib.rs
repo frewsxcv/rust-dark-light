@@ -69,6 +69,14 @@ impl Mode {
             Mode::Light
         }
     }
+    fn rgb(r: u32, g: u32, b: u32) -> Self {
+        let window_background_gray = (r * 11 + g * 16 + b * 5) / 32;
+        if window_background_gray < 192 {
+            Self::Dark
+        } else {
+            Self::Light
+        }
+    }
 }
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Light`].
