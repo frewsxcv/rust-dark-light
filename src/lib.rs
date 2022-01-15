@@ -25,6 +25,7 @@ use windows as platform;
 
 #[cfg(target_os = "linux")]
 mod freedesktop;
+
 #[cfg(target_os = "linux")]
 use freedesktop as platform;
 
