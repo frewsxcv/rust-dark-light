@@ -1,14 +1,16 @@
 use detect_desktop_environment::DesktopEnvironment;
-use std::path::Path;
-
+use ini::Ini;
+use std::path::{Path, PathBuf};
 use zbus::blocking::Connection;
 use zvariant::Value;
 
 use crate::Mode;
 
+const XDG_KDEGLOBALS: &str = "/etc/xdg/kdeglobals";
+
 fn get_freedesktop_color_scheme() -> Option<Mode> {
     let conn = Connection::session();
-    if let Err(_) = conn {
+    if conn.is_err() {
         return None;
     }
     let reply = conn.unwrap().call_method(
@@ -20,7 +22,7 @@ fn get_freedesktop_color_scheme() -> Option<Mode> {
     );
     if let Ok(reply) = &reply {
         let theme = reply.body::<Value>();
-        if let Err(_) = theme {
+        if theme.is_err() {
             return None;
         }
         let theme = theme.unwrap().downcast::<u32>();
@@ -30,40 +32,44 @@ fn get_freedesktop_color_scheme() -> Option<Mode> {
             _ => None,
         }
     } else {
-        return None;
+        None
     }
 }
 
-fn check_file(pattern: &str, path: &Path) -> Mode {
-    match std::fs::read_to_string(path) {
-        Ok(content) => {
-            let theme = content
-                .lines()
-                .filter(|line| line.contains(pattern))
-                .collect::<String>();
-            Mode::from(theme.to_lowercase().contains("dark"))
-        }
-        Err(_) => Mode::Light,
-    }
-}
-
-fn check_config_file(pattern: &str, path: &str) -> Mode {
-    match dirs::config_dir() {
-        Some(config_dir) => check_file(pattern, &config_dir.join(path)),
-        None => Mode::Light,
-    }
-}
-
-fn check_dconf(pattern: &str) -> Mode {
+fn detect_gtk(pattern: &str) -> Mode {
     match dconf_rs::get_string(pattern) {
-        Ok(theme) => {
-            if theme.to_lowercase().contains("dark") {
-                Mode::Dark
-            } else {
-                Mode::Light
-            }
-        }
+        Ok(theme) => Mode::from(theme.to_lowercase().contains("dark")),
         Err(_) => Mode::Light,
+    }
+}
+
+fn detect_kde(path: &str) -> Mode {
+    match Ini::load_from_file(path) {
+        Ok(cfg) => {
+            let section = match cfg.section(Some("Colors:Window")) {
+                Some(section) => section,
+                None => return Mode::Light,
+            };
+            let values = match section.get("BackgroundNormal") {
+                Some(string) => string,
+                None => return Mode::Light,
+            };
+            let rgb = values
+                .split(',')
+                .map(|s| s.parse::<u32>().unwrap_or(255))
+                .collect::<Vec<u32>>();
+            let rgb = if rgb.len() > 2 {
+                rgb
+            } else {
+                vec![255, 255, 255]
+            };
+            let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
+            Mode::rgb(r, g, b)
+        }
+        Err(e) => {
+            eprintln!("{:?}", e);
+            Mode::Light
+        }
     }
 }
 
@@ -72,17 +78,18 @@ pub fn detect() -> Mode {
         Some(mode) => mode,
         // Other desktop environments are still being worked on, fow now, only the following implementations work.
         None => match DesktopEnvironment::detect() {
-            DesktopEnvironment::Cinnamon => {
-                check_dconf("/org/cinnamon/desktop/interface/gtk-theme")
+            DesktopEnvironment::Kde => {
+                let path = if Path::new(XDG_KDEGLOBALS).exists() {
+                    PathBuf::from(XDG_KDEGLOBALS)
+                } else {
+                    dirs::home_dir().unwrap().join(".config/kdeglobals")
+                };
+                detect_kde(path.to_str().unwrap())
             }
-            DesktopEnvironment::Gnome => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Kde => check_config_file("Name=", "kdeglobals"),
-            DesktopEnvironment::Mate => check_dconf("/org/mate/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Unity => check_dconf("/org/gnome/desktop/interface/gtk-theme"),
-            DesktopEnvironment::Xfce => check_config_file(
-                "name=\"ThemeName\"",
-                "xfce4/xfconf/xfce-perchannel-xml/xsettings.xml",
-            ),
+            DesktopEnvironment::Cinnamon => detect_gtk("/org/cinnamon/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Gnome => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Mate => detect_gtk("/org/mate/desktop/interface/gtk-theme"),
+            DesktopEnvironment::Unity => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
             _ => Mode::Light,
         },
     }
