@@ -1,5 +1,5 @@
 use crate::Mode;
 
-pub fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
+pub async fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
     todo!()
 }

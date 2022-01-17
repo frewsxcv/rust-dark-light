@@ -24,13 +24,13 @@ fn detect_kde(path: &str) -> anyhow::Result<Mode> {
         .split(',')
         .map(|s| s.parse::<u32>().unwrap_or(255))
         .collect::<Vec<u32>>();
-    let rgb = if rgb.len() > 2 {
+    let rgb = if rgb.len() >= 3 {
         rgb
     } else {
         vec![255, 255, 255]
     };
     let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
-    Ok(Mode::rgb(r, g, b))
+    Ok(Mode::from_rgb(r, g, b))
 }
 
 fn legacy_detect() -> anyhow::Result<Mode> {
