@@ -9,6 +9,9 @@ description = "Detect if dark mode or light mode is enabled"
 readme = "README.md"
 build = "build.rs"
 
+[dependencies]
+anyhow = "1.0.52"
+
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 detect-desktop-environment = "0.2"
 dconf_rs = "0.3"

@@ -10,7 +10,10 @@
 //!     dark_light::Mode::Dark => {},
 //!     // Light mode
 //!     dark_light::Mode::Light => {},
+<<<<<<< HEAD
 //!     // Unspecified
+=======
+>>>>>>> a9e10e2 (Callback functions)
 //!     dark_light::Mode::Default => {},
 //! }
 //! ```
@@ -93,5 +96,9 @@ impl Mode {
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
 pub fn detect() -> Mode {
-    platform::detect()
+    platform::detect::detect()
+}
+
+pub fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
+    platform::notify::notify(callback)
 }
