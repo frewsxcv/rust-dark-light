@@ -84,7 +84,7 @@ impl Mode {
             Mode::Light
         }
     }
-    fn rgb(r: u32, g: u32, b: u32) -> Self {
+    fn from_rgb(r: u32, g: u32, b: u32) -> Self {
         let window_background_gray = (r * 11 + g * 16 + b * 5) / 32;
         if window_background_gray < 192 {
             Self::Dark
@@ -99,6 +99,6 @@ pub fn detect() -> Mode {
     platform::detect::detect()
 }
 
-pub fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
-    platform::notify::notify(callback)
+pub async fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
+    platform::notify::notify(callback).await
 }
