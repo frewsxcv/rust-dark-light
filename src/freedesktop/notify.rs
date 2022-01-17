@@ -1,24 +1,61 @@
-use zbus::names::MemberName;
-use zvariant::{OwnedValue, Value};
-use std::{sync::mpsc::{self, Sender, Receiver}, thread, ops::Deref, convert::TryFrom};
+use std::thread;
+use async_ashpd::Error;
+use async_ashpd::desktop::settings::{SettingsProxy, ColorScheme};
+use async_ashpd::zbus::Connection;
+use crossbeam::channel::{self, Sender};
 
 use crate::Mode;
 
 use super::{get_freedesktop_color_scheme, detect::detect};
 
-pub fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
-    let (tx, rx): (Sender<Mode>, Receiver<Mode>) = mpsc::channel();
-    if get_freedesktop_color_scheme().is_ok() {
-        freedesktop_watch(tx)?;
-    } else {
-        non_freedesktop_watch(tx)?;
-    }
-    loop {
-        match rx.recv() {
-            Ok(mode) => callback(mode),
-            Err(_) => {},
+struct Settings<'a> {
+    proxy: &'a SettingsProxy<'a>
+}
+
+impl<'a> Settings<'a> {
+    fn new(proxy: &'a SettingsProxy<'a>) -> Self {
+        Self {
+            proxy
         }
     }
+    async fn receive(&self) -> std::result::Result<ColorScheme, Error> {
+        self.proxy.receive_color_scheme_changed().await
+    }
+}
+
+pub async fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
+    let (tx, rx) = channel::unbounded();
+    let connection = Connection::session().await?;
+    let proxy = SettingsProxy::new(&connection).await?;
+    let settings = Settings::new(&proxy);
+    if get_freedesktop_color_scheme().is_ok() {
+        loop {
+            let tx = tx.clone();
+            freedesktop_watch(tx, &settings).await?;
+            match rx.recv() {
+                Ok(mode) => callback(mode),
+                Err(_) => {},
+            }
+        }
+    } else {
+        non_freedesktop_watch(tx)?;
+        loop {
+            match rx.recv() {
+                Ok(mode) => callback(mode),
+                Err(_) => {},
+            }
+        }
+    }
+}
+
+async fn freedesktop_watch<'a>(tx: Sender<Mode>, settings: &'a Settings<'a>) -> anyhow::Result<()> {
+    let color_scheme = match settings.receive().await? {
+        ColorScheme::PreferDark => Mode::Dark,
+        ColorScheme::PreferLight => Mode::Light,
+        ColorScheme::NoPreference => Mode::Default,
+    };
+    tx.send(color_scheme).unwrap();
+    Ok(())
 }
 
 fn non_freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {
@@ -32,33 +69,6 @@ fn non_freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {
                 tx.send(mode).unwrap();
             }
         }
-    });
-    Ok(())
-}
-
-fn freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {
-    let connection = zbus::blocking::Connection::session()?;
-    let proxy = zbus::blocking::Proxy::new(
-        &connection,
-        "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop",
-        "org.freedesktop.portal.Settings",
-    )?;
-    thread::spawn(move || -> anyhow::Result<()> {
-        for signal in proxy.receive_signal(&MemberName::try_from("SettingChanged")?)? {
-            let msg = signal.deref();
-            let msg_header = signal.header()?;
-            if msg_header.message_type()? == zbus::MessageType::Signal && msg_header.member()? == Some(&MemberName::try_from("SettingChanged")?) {
-                let response = msg.body::<(String, String, OwnedValue)>()?;
-                let mode = match response.2.downcast_ref::<Value>().unwrap().downcast_ref::<u32>().unwrap() {
-                    1 => Mode::Dark,
-                    2 => Mode::Light,
-                    _ => Mode::Default,
-                };
-                tx.send(mode).unwrap();
-            }
-        }
-        Ok(())
     });
     Ok(())
 }

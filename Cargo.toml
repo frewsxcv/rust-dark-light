@@ -18,6 +18,10 @@ dconf_rs = "0.3"
 dirs = "4.0"
 zbus = "4.1.2"
 rust-ini = "0.18"
+ashpd = "0.3.2"
+async_ashpd = { package = "ashpd", version = "0.3.2" }
+tokio = { version = "1.15.0", features = ["full"] }
+crossbeam = "0.8.1"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.10"
