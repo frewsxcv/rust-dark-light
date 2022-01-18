@@ -1,6 +1,6 @@
 [package]
 name = "dark-light"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Corey Farwell <coreyf@rwell.org>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
@@ -9,7 +9,13 @@ description = "Detect if dark mode or light mode is enabled"
 readme = "README.md"
 build = "build.rs"
 
-[dependencies]
+[target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
+detect-desktop-environment = "0.2.0"
+dconf_rs = "0.3.0"
+dirs = "4.0.0"
+zbus = "2.0.0"
+zvariant = "3.0.0"
+rust-ini = "0.17"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.8.0"

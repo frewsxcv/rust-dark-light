@@ -1,3 +1,4 @@
+use crate::Mode;
 use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
 
@@ -38,9 +39,5 @@ fn is_dark_mode_enabled() -> bool {
 }
 
 pub fn detect() -> crate::Mode {
-    if is_dark_mode_enabled() {
-        crate::Mode::Dark
-    } else {
-        crate::Mode::Light
-    }
+    Mode::from(is_dark_mode_enabled())
 }
