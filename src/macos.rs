@@ -28,6 +28,12 @@ fn is_dark_mode_enabled() -> bool {
             count:objects.len()
         ];
 
+        // `bestMatchFromAppearancesWithNames` is only available in macOS 10.14+.
+        // Gracefully handle earlier versions.
+        if !msg_send![appearance, respondsToSelector:sel!(bestMatchFromAppearancesWithNames:)] {
+            return false;
+        }
+
         let style: *const Object = msg_send![
             appearance,
             bestMatchFromAppearancesWithNames:&*names
