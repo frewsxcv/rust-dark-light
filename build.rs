@@ -1,5 +1,6 @@
 fn main() {
-    if std::env::var("TARGET").unwrap().contains("-apple") {
+    #[cfg(target_vendor = "apple")]
+    {
         println!("cargo:rustc-link-lib=framework=AppKit");
     }
 }
