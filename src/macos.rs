@@ -33,10 +33,11 @@ fn is_dark_mode_enabled() -> bool {
 
         // `bestMatchFromAppearancesWithNames` is only available in macOS 10.14+.
         // Gracefully handle earlier versions.
-        if !msg_send![
+        let responds_to_selector: objc::runtime::BOOL = msg_send![
             appearance,
             respondsToSelector: sel!(bestMatchFromAppearancesWithNames:)
-        ] {
+        ];
+        if responds_to_selector == objc::runtime::NO {
             return false;
         }
 
