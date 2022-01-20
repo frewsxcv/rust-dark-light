@@ -7,6 +7,7 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/frewsxcv/rust-dark-light"
 description = "Detect if dark mode or light mode is enabled"
 readme = "README.md"
+build = "build.rs"
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 detect-desktop-environment = "0.2.0"
@@ -18,3 +19,6 @@ rust-ini = "0.17"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.8.0"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc = "0.2"

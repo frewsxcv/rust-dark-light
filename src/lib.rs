@@ -4,7 +4,7 @@
 //!
 //! ```
 //! let mode = dark_light::detect();
-//! 
+//!
 //! match mode {
 //!     dark_light::Mode::Dark => {},
 //!     dark_light::Mode::Light => {},
