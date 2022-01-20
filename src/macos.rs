@@ -1,3 +1,6 @@
+// Dark/light mode detection on macOS.
+// Written with help from Ryan McGrath (https://rymc.io/).
+
 use crate::Mode;
 use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
