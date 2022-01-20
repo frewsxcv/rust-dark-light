@@ -45,8 +45,8 @@ fn is_dark_mode_enabled() -> bool {
             bestMatchFromAppearancesWithNames:&*names
         ];
 
-        return style == NSAppearanceNameDarkAqua
-            || style == NSAppearanceNameAccessibilityHighContrastDarkAqua;
+        style == NSAppearanceNameDarkAqua
+            || style == NSAppearanceNameAccessibilityHighContrastDarkAqua
     }
 }
 
