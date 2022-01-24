@@ -38,6 +38,11 @@ mod freedesktop;
 ))]
 use freedesktop as platform;
 
+#[cfg(target_arch = "wasm32")]
+mod websys;
+#[cfg(target_arch = "wasm32")]
+use websys as platform;
+
 #[cfg(not(any(
     target_os = "macos",
     target_os = "windows",
@@ -45,7 +50,8 @@ use freedesktop as platform;
     target_os = "freebsd",
     target_os = "dragonfly",
     target_os = "netbsd",
-    target_os = "openbsd"
+    target_os = "openbsd",
+    target_arch = "wasm32"
 )))]
 mod platform {
     pub fn detect() -> crate::Mode {
