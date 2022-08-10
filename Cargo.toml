@@ -10,15 +10,15 @@ readme = "README.md"
 build = "build.rs"
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
-detect-desktop-environment = "0.2.0"
-dconf_rs = "0.3.0"
-dirs = "4.0.0"
-zbus = "2.0.0"
-zvariant = "3.0.0"
-rust-ini = "0.17"
+detect-desktop-environment = "0.2"
+dconf_rs = "0.3"
+dirs = "4.0"
+zbus = "2.3"
+zvariant = "3.6"
+rust-ini = "0.18"
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.8.0"
+winreg = "0.10"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
