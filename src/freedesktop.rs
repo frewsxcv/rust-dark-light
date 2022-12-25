@@ -90,7 +90,7 @@ pub fn detect() -> Mode {
             DesktopEnvironment::Gnome => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
             DesktopEnvironment::Mate => detect_gtk("/org/mate/desktop/interface/gtk-theme"),
             DesktopEnvironment::Unity => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
-            _ => Mode::Light,
+            _ => Mode::Default,
         },
     }
 }
