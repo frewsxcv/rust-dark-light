@@ -91,7 +91,7 @@ impl Mode {
     }
 }
 
-/// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Light`].
+/// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
 pub fn detect() -> Mode {
     platform::detect()
 }
