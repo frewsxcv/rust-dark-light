@@ -6,8 +6,11 @@
 //! let mode = dark_light::detect();
 //!
 //! match mode {
+//!     // Dark mode
 //!     dark_light::Mode::Dark => {},
+//!     // Light mode
 //!     dark_light::Mode::Light => {},
+//!     // Unspecified
 //!     dark_light::Mode::Default => {},
 //! }
 //! ```
@@ -62,8 +65,11 @@ mod platform {
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Mode {
+    /// Dark mode
     Dark,
+    /// Light mode
     Light,
+    /// Unspecified
     Default,
 }
 
