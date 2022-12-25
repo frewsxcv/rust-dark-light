@@ -8,6 +8,7 @@
 //! match mode {
 //!     dark_light::Mode::Dark => {},
 //!     dark_light::Mode::Light => {},
+//!     dark_light::Mode::Default => {},
 //! }
 //! ```
 
@@ -63,6 +64,7 @@ mod platform {
 pub enum Mode {
     Dark,
     Light,
+    Default,
 }
 
 impl Mode {
