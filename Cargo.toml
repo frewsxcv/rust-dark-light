@@ -22,6 +22,8 @@ dirs = "4.0"
 zbus = "3.0"
 zvariant = "3.6"
 rust-ini = "0.18"
+ashpd = "0.3.2"
+async_ashpd = { package = "ashpd", version = "0.3.2" }
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.10"
