@@ -10,10 +10,7 @@
 //!     dark_light::Mode::Dark => {},
 //!     // Light mode
 //!     dark_light::Mode::Light => {},
-<<<<<<< HEAD
 //!     // Unspecified
-=======
->>>>>>> a9e10e2 (Callback functions)
 //!     dark_light::Mode::Default => {},
 //! }
 //! ```
