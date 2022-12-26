@@ -20,6 +20,8 @@
 
 #[cfg(target_os = "macos")]
 mod macos;
+use std::sync::mpsc::Sender;
+
 #[cfg(target_os = "macos")]
 use macos as platform;
 
@@ -99,6 +101,6 @@ pub fn detect() -> Mode {
     platform::detect::detect()
 }
 
-pub async fn notify(callback: &dyn Fn(Mode)) -> anyhow::Result<()> {
-    platform::notify::notify(callback).await
+pub async fn notify(tx: Sender<crate::Mode>) -> anyhow::Result<()> {
+    platform::notify::notify(tx).await
 }

@@ -12,16 +12,15 @@ build = "build.rs"
 [dependencies]
 anyhow = "1.0.52"
 
+[dev-dependencies]
+tokio = { version = "1.15.0", features = ["full"] }
+
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 detect-desktop-environment = "0.2"
 dconf_rs = "0.3"
 dirs = "4.0"
 zbus = "4.1.2"
 rust-ini = "0.18"
-ashpd = "0.3.2"
-async_ashpd = { package = "ashpd", version = "0.3.2" }
-tokio = { version = "1.15.0", features = ["full"] }
-crossbeam = "0.8.1"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.10"
@@ -31,11 +30,3 @@ objc = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web-sys = { version = "0.3", features = [ "MediaQueryList", "Window" ] }
-
-[[example]]
-name = "detect"
-path = "examples/detect/src/main.rs"
-
-[[example]]
-name = "notify"
-path = "examples/notify/src/main.rs"
