@@ -53,12 +53,13 @@ fn legacy_detect() -> anyhow::Result<Mode> {
 }
 
 pub fn detect() -> Mode {
-    match get_freedesktop_color_scheme() {
+    match legacy_detect() {
         Ok(mode) => mode,
-        Err(_) => match legacy_detect() {
-            Ok(mode) => mode,
-            Err(_) => Mode::Default,
-        },
+        Err(_) => Mode::Default,
     }
+}
+
+pub async fn detect_async() -> anyhow::Result<Mode> {
+    get_freedesktop_color_scheme().await
 }
 

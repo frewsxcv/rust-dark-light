@@ -17,7 +17,6 @@
 
 #[cfg(target_os = "macos")]
 mod macos;
-use std::sync::mpsc::Sender;
 
 #[cfg(target_os = "macos")]
 use macos as platform;
@@ -64,6 +63,8 @@ mod platform {
         super::Mode::Light
     }
 }
+
+use tokio::sync::mpsc::Sender;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Mode {
