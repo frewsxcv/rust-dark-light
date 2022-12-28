@@ -1,4 +1,3 @@
-use anyhow::Context;
 use ashpd::desktop::settings::SettingsProxy;
 
 use crate::Mode;
@@ -6,12 +5,15 @@ use crate::Mode;
 pub mod detect;
 pub mod notify;
 
-fn get_freedesktop_color_scheme() -> anyhow::Result<Mode> {
-    let connection = ashpd::zbus::Connection::new_session()?;
-    let proxy = SettingsProxy::new(&connection)?;
-    let color_scheme = *proxy.read("org.freedesktop.appearance", "color-scheme")?
-        .downcast_ref::<ashpd::zvariant::Value>().with_context(|| "Failed to downcast OwnedValue to Value")?
-        .downcast_ref::<u32>().with_context(|| "Failed to downcast Value to u32")?;
+async fn get_freedesktop_color_scheme() -> anyhow::Result<Mode> {
+    let mode = fetch_color_scheme_from_proxy().await?;
+    Ok(mode)
+}
+
+async fn fetch_color_scheme_from_proxy() -> anyhow::Result<Mode> {
+    let connection = ashpd::zbus::Connection::session().await?;
+    let proxy = SettingsProxy::new(&connection).await?;
+    let color_scheme = proxy.read::<i32>("org.freedesktop.appearance", "color-scheme").await?;
     let mode = match color_scheme {
         1 => Mode::Dark,
         2 => Mode::Light,
