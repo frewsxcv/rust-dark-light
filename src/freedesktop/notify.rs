@@ -3,24 +3,24 @@ use ashpd::desktop::settings::{SettingsProxy, ColorScheme};
 use ashpd::zbus::Connection;
 use tokio::sync::mpsc::Sender;
 
-use crate::Mode;
+use crate::{Mode, detect};
 
-use super::detect::detect_async;
 use super::get_freedesktop_color_scheme;
 
 pub async fn notify(tx: Sender<crate::Mode>) -> anyhow::Result<()> {
-    
     if get_freedesktop_color_scheme().await.is_ok() {
+        eprintln!("Using FreeDesktop to detect color scheme...");
         freedesktop_watch(tx.clone()).await
     } else {
+        eprintln!("Unable to start proxy, falling back to legacy...");
         non_freedesktop_watch(tx).await
     }
 }
 
-async fn freedesktop_watch<'a>(tx: Sender<Mode>) -> anyhow::Result<()> {
+async fn freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {
+    let connection = Connection::session().await?;
+    let proxy = SettingsProxy::new(&connection).await?;
     tokio::spawn(async move {
-        let connection = Connection::session().await.unwrap();
-        let proxy = SettingsProxy::new(&connection).await.unwrap();
         loop {
             if let Ok(color_scheme) = proxy.receive_color_scheme_changed().await {
                 let mode = match color_scheme {
@@ -36,10 +36,10 @@ async fn freedesktop_watch<'a>(tx: Sender<Mode>) -> anyhow::Result<()> {
 }
 
 async fn non_freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {
-    let mut mode = detect_async().await?;
     tokio::spawn(async move {
+        let mut mode = detect();
         loop {
-            let new_mode = detect_async().await.unwrap();
+            let new_mode = detect();
             if mode != new_mode {
                 mode = new_mode;
                 tx.send(mode).await.unwrap();

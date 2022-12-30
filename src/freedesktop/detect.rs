@@ -5,8 +5,6 @@ use std::path::{Path, PathBuf};
 
 use crate::Mode;
 
-use super::get_freedesktop_color_scheme;
-
 const XDG_KDEGLOBALS: &str = "/etc/xdg/kdeglobals";
 
 fn detect_gtk(pattern: &str) -> Mode {
@@ -57,9 +55,5 @@ pub fn detect() -> Mode {
         Ok(mode) => mode,
         Err(_) => Mode::Default,
     }
-}
-
-pub async fn detect_async() -> anyhow::Result<Mode> {
-    get_freedesktop_color_scheme().await
 }
 
