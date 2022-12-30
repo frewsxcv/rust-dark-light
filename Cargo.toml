@@ -22,7 +22,7 @@ dirs = "4.0"
 zbus = "3.0"
 zvariant = "3.6"
 rust-ini = "0.18"
-ashpd = "0.3.2"
+ashpd = { git = "https://github.com/bilelmoussaoui/ashpd", branch = "master" }
 crossbeam = "0.8.2"
 tokio = { version = "1.23.0", features = ["full"] }
 
