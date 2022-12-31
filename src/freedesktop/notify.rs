@@ -4,8 +4,6 @@ use ashpd::desktop::settings::{Settings, ColorScheme};
 
 use crate::{Mode, detect};
 
-use super::get_freedesktop_color_scheme;
-
 pub async fn notify(tx: Sender<crate::Mode>) -> anyhow::Result<()> {
     if get_freedesktop_color_scheme().await.is_ok() {
         tokio::spawn(freedesktop_watch(tx));
@@ -14,6 +12,17 @@ pub async fn notify(tx: Sender<crate::Mode>) -> anyhow::Result<()> {
         tokio::spawn(non_freedesktop_watch(tx));
     }
     Ok(())
+}
+
+async fn get_freedesktop_color_scheme() -> anyhow::Result<Mode> {
+    let proxy = Settings::new().await?;
+    let color_scheme = proxy.color_scheme().await?;
+    let mode = match color_scheme {
+        ColorScheme::PreferDark => Mode::Dark,
+        ColorScheme::PreferLight => Mode::Light,
+        ColorScheme::NoPreference => Mode::Default,
+    };
+    Ok(mode)
 }
 
 async fn freedesktop_watch(tx: Sender<Mode>) -> anyhow::Result<()> {

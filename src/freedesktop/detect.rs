@@ -1,54 +1,10 @@
 use anyhow::Context;
 use detect_desktop_environment::DesktopEnvironment;
 use ini::Ini;
-use std::path::{Path, PathBuf};
 
 use crate::Mode;
 
-const XDG_KDEGLOBALS: &str = "/etc/xdg/kdeglobals";
-
-fn detect_gtk(pattern: &str) -> Mode {
-    match dconf_rs::get_string(pattern) {
-        Ok(theme) => Mode::from(theme.to_lowercase().contains("dark")),
-        Err(_) => Mode::Default,
-    }
-}
-
-fn detect_kde(path: &str) -> anyhow::Result<Mode> {
-    let cfg = Ini::load_from_file(path)?;
-    let section = cfg.section(Some("Colors:Window")).with_context(|| "Failed to get section Colors:Window")?;
-    let values = section.get("BackgroundNormal").with_context(|| "Failed to get BackgroundNormal inside Colors:Window")?;
-    let rgb = values
-        .split(',')
-        .map(|s| s.parse::<u32>().unwrap_or(255))
-        .collect::<Vec<u32>>();
-    let rgb = if rgb.len() >= 3 {
-        rgb
-    } else {
-        vec![255, 255, 255]
-    };
-    let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
-    Ok(Mode::from_rgb(r, g, b))
-}
-
-fn legacy_detect() -> anyhow::Result<Mode> {
-    let mode = match DesktopEnvironment::detect() {
-        DesktopEnvironment::Kde => {
-            let path = if Path::new(XDG_KDEGLOBALS).exists() {
-                PathBuf::from(XDG_KDEGLOBALS)
-            } else {
-                dirs::home_dir().unwrap().join(".config/kdeglobals")
-            };
-            detect_kde(path.to_str().unwrap())?
-        }
-        DesktopEnvironment::Cinnamon => detect_gtk("/org/cinnamon/desktop/interface/gtk-theme"),
-        DesktopEnvironment::Gnome => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
-        DesktopEnvironment::Mate => detect_gtk("/org/mate/desktop/interface/gtk-theme"),
-        DesktopEnvironment::Unity => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
-        _ => Mode::Default,
-    };
-    Ok(mode)
-}
+use super::{CINNAMON, GNOME, MATE};
 
 pub fn detect() -> Mode {
     match legacy_detect() {
@@ -57,3 +13,47 @@ pub fn detect() -> Mode {
     }
 }
 
+fn legacy_detect() -> anyhow::Result<Mode> {
+    let mode = match DesktopEnvironment::detect() {
+        DesktopEnvironment::Kde => kde_detect()?,
+        DesktopEnvironment::Cinnamon => dconf_detect(CINNAMON),
+        DesktopEnvironment::Gnome => dconf_detect(GNOME),
+        DesktopEnvironment::Mate => dconf_detect(MATE),
+        DesktopEnvironment::Unity => dconf_detect(GNOME),
+        _ => Mode::Default,
+    };
+    Ok(mode)
+}
+
+fn dconf_detect(path: &str) -> Mode {
+    match dconf_rs::get_string(path) {
+        Ok(theme) => Mode::from(Some(theme.to_lowercase().contains("dark"))),
+        Err(_) => Mode::Default,
+    }
+}
+
+fn kde_detect() -> anyhow::Result<Mode> {
+    let xdg = xdg::BaseDirectories::new()?;
+    let path = xdg.find_config_file("kdeglobals")
+        .context("Path not found")?;
+    let cfg = Ini::load_from_file(path)?;
+    let properties = cfg.section(Some("Colors:Window"))
+        .context("Failed to get section Colors:Window")?;
+    let background = properties.get("BackgroundNormal")
+        .context("Failed to get BackgroundNormal inside Colors:Window")?;
+    let rgb = rgb_from_string(background)?;
+    Ok(Mode::from_rgb(&rgb))
+}
+
+fn rgb_from_string(rgb: &str) -> anyhow::Result<Vec<u32>> {
+    rgb.split(',')
+        .map(|s| s.parse::<u32>().unwrap_or_else(|_| 255))
+        .try_fold(vec![255, 255, 255], |mut acc, x| {
+            if acc.len() < 3 {
+                acc.push(x);
+                Ok(acc)
+            } else {
+                Err(anyhow::anyhow!("Too many elements"))
+            }
+        })
+}
