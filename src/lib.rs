@@ -77,15 +77,19 @@ pub enum Mode {
 }
 
 impl Mode {
-    fn from(b: bool) -> Self {
-        if b {
-            Mode::Dark
+    fn from(mode: Option<bool>) -> Self {
+        if let Some(mode) = mode {
+            if mode {
+                Mode::Dark
+            } else {
+                Mode::Light
+            }
         } else {
-            Mode::Light
+            Mode::Default
         }
     }
-    fn from_rgb(r: u32, g: u32, b: u32) -> Self {
-        let window_background_gray = (r * 11 + g * 16 + b * 5) / 32;
+    fn from_rgb(rgb: &[u32]) -> Self {
+        let window_background_gray = (rgb[0] * 11 + rgb[1] * 16 + rgb[2] * 5) / 32;
         if window_background_gray < 192 {
             Self::Dark
         } else {
