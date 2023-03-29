@@ -66,10 +66,7 @@ fn detect_kde(path: &str) -> Mode {
             let (r, g, b) = (rgb[0], rgb[1], rgb[2]);
             Mode::rgb(r, g, b)
         }
-        Err(e) => {
-            eprintln!("{:?}", e);
-            Mode::Light
-        }
+        Err(_) => Mode::Light,
     }
 }
 
