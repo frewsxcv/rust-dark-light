@@ -64,8 +64,6 @@ mod platform {
     }
 }
 
-use tokio::sync::mpsc::Sender;
-
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Mode {
     /// Dark mode
@@ -103,6 +101,7 @@ pub fn detect() -> Mode {
     platform::detect::detect()
 }
 
-pub async fn notify(tx: Sender<crate::Mode>) -> anyhow::Result<()> {
-    platform::notify::notify(tx).await
+/// Watch for changes in light mode or dark mode. If the mode can’t be detected, fall back to [`Mode::Default`].
+pub async fn notify(action: fn(mode: Mode)) -> anyhow::Result<()> {
+    platform::notify::notify(action).await
 }

@@ -16,14 +16,11 @@ anyhow = "1.0.52"
 tokio = { version = "1.23.0", features = ["full"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
-detect-desktop-environment = "0.2"
+detect-desktop-environment = "1.0.0"
 dconf_rs = "0.3"
-dirs = "4.0"
-zbus = "4.1.2"
-rust-ini = "0.18"
-ashpd = { git = "https://github.com/bilelmoussaoui/ashpd", branch = "master" }
-crossbeam = "0.8.2"
-tokio = { version = "1.23.0", features = ["full"] }
+zbus = "3.0"
+rust-ini = "0.19"
+ashpd = "0.6.0"
 xdg = "2.4.1"
 
 [target.'cfg(windows)'.dependencies]
@@ -33,4 +30,4 @@ winreg = "0.10"
 objc = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-web-sys = { version = "0.3", features = [ "MediaQueryList", "Window" ] }
+web-sys = { version = "0.3", features = ["MediaQueryList", "Window"] }
