@@ -15,12 +15,15 @@ pub fn detect() -> Mode {
 
 fn legacy_detect() -> anyhow::Result<Mode> {
     let mode = match DesktopEnvironment::detect() {
-        DesktopEnvironment::Kde => kde_detect()?,
-        DesktopEnvironment::Cinnamon => dconf_detect(CINNAMON),
-        DesktopEnvironment::Gnome => dconf_detect(GNOME),
-        DesktopEnvironment::Mate => dconf_detect(MATE),
-        DesktopEnvironment::Unity => dconf_detect(GNOME),
-        _ => Mode::Default,
+        Some(mode) => match mode {
+            DesktopEnvironment::Kde => kde_detect()?,
+            DesktopEnvironment::Cinnamon => dconf_detect(CINNAMON),
+            DesktopEnvironment::Gnome => dconf_detect(GNOME),
+            DesktopEnvironment::Mate => dconf_detect(MATE),
+            DesktopEnvironment::Unity => dconf_detect(GNOME),
+            _ => Mode::Default,
+        },
+        None => Mode::Default,
     };
     Ok(mode)
 }
