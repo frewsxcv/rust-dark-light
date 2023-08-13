@@ -37,12 +37,15 @@ fn dconf_detect(path: &str) -> Mode {
 
 fn kde_detect() -> anyhow::Result<Mode> {
     let xdg = xdg::BaseDirectories::new()?;
-    let path = xdg.find_config_file("kdeglobals")
+    let path = xdg
+        .find_config_file("kdeglobals")
         .context("Path not found")?;
     let cfg = Ini::load_from_file(path)?;
-    let properties = cfg.section(Some("Colors:Window"))
+    let properties = cfg
+        .section(Some("Colors:Window"))
         .context("Failed to get section Colors:Window")?;
-    let background = properties.get("BackgroundNormal")
+    let background = properties
+        .get("BackgroundNormal")
         .context("Failed to get BackgroundNormal inside Colors:Window")?;
     let rgb = rgb_from_string(background)?;
     Ok(Mode::from_rgb(&rgb))

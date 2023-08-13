@@ -1,8 +1,7 @@
-
-use ashpd::desktop::settings::{Settings, ColorScheme};
+use ashpd::desktop::settings::{ColorScheme, Settings};
 use zbus::export::futures_util::StreamExt;
 
-use crate::{Mode, detect};
+use crate::{detect, Mode};
 
 pub async fn notify(action: fn(mode: Mode)) -> anyhow::Result<()> {
     if get_freedesktop_color_scheme().await.is_ok() {
