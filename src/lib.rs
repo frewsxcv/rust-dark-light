@@ -64,6 +64,10 @@ mod platform {
     }
 }
 
+mod rgb;
+use rgb::Rgb;
+
+/// Enum representing dark mode, light mode, or unspecified.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Mode {
     /// Dark mode
@@ -75,19 +79,18 @@ pub enum Mode {
 }
 
 impl Mode {
-    fn from(mode: Option<bool>) -> Self {
-        if let Some(mode) = mode {
-            if mode {
-                Mode::Dark
-            } else {
-                Mode::Light
-            }
+    /// Convert a boolean to [`Mode`]. `true` is [`Mode::Dark`], `false` is [`Mode::Light`].
+    fn from(mode: bool) -> Self {
+        if mode {
+            Mode::Dark
         } else {
-            Mode::Default
+            Mode::Light
         }
     }
-    fn from_rgb(rgb: &[u32]) -> Self {
-        let window_background_gray = (rgb[0] * 11 + rgb[1] * 16 + rgb[2] * 5) / 32;
+
+    /// Convert an RGB color to [`Mode`]. The color is converted to grayscale, and if the grayscale value is less than 192, [`Mode::Dark`] is returned. Otherwise, [`Mode::Light`] is returned.
+    fn from_rgb(rgb: Rgb) -> Self {
+        let window_background_gray = (rgb.0 * 11 + rgb.1 * 16 + rgb.2 * 5) / 32;
         if window_background_gray < 192 {
             Self::Dark
         } else {

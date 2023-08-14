@@ -8,7 +8,7 @@ pub fn detect() -> Mode {
     let hkcu = RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
     if let Ok(subkey) = hkcu.open_subkey(SUBKEY) {
         if let Ok(dword) = subkey.get_value::<u32, _>(VALUE) {
-            return Mode::from(Some(dword == 0));
+            return Mode::from(dword == 0);
         }
     }
     Mode::Light
