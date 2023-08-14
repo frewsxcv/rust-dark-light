@@ -52,5 +52,5 @@ fn is_dark_mode_enabled() -> bool {
 }
 
 pub fn detect() -> crate::Mode {
-    Mode::from(Some(is_dark_mode_enabled()))
+    Mode::from(is_dark_mode_enabled())
 }
