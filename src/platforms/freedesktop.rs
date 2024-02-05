@@ -3,7 +3,7 @@ use std::str::FromStr;
 use anyhow::Context;
 use ini::Ini;
 
-use crate::{Mode, rgb::Rgb};
+use crate::{utils::rgb::Rgb, Mode};
 
 pub mod detect;
 pub mod notify;
