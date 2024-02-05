@@ -1,13 +1,10 @@
-use anyhow::Ok;
-use dark_light::*;
+use dark_light::ThemeWatcher;
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let action = |mode| match mode {
-        Mode::Dark => println!("Dark mode"),
-        Mode::Light => println!("Light mode"),
-        Mode::Default => println!("Default or unspecified"),
-    };
-    notify(action).await?;
-    Ok(())
+async fn main() {
+    let mut receiver = ThemeWatcher::new().lock().await.subscribe();
+
+    while let Ok(mode) = receiver.recv().await {
+        println!("New mode: {:?}", mode);
+    }
 }
