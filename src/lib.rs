@@ -15,57 +15,11 @@
 //! }
 //! ```
 
-#[cfg(target_os = "macos")]
-mod macos;
+mod platforms;
+use platforms::platform;
 
-#[cfg(target_os = "macos")]
-use macos as platform;
-
-#[cfg(target_os = "windows")]
-mod windows;
-#[cfg(target_os = "windows")]
-use windows as platform;
-
-#[cfg(any(
-    target_os = "linux",
-    target_os = "freebsd",
-    target_os = "dragonfly",
-    target_os = "netbsd",
-    target_os = "openbsd"
-))]
-mod freedesktop;
-#[cfg(any(
-    target_os = "linux",
-    target_os = "freebsd",
-    target_os = "dragonfly",
-    target_os = "netbsd",
-    target_os = "openbsd"
-))]
-use freedesktop as platform;
-
-#[cfg(target_arch = "wasm32")]
-mod websys;
-#[cfg(target_arch = "wasm32")]
-use websys as platform;
-
-#[cfg(not(any(
-    target_os = "macos",
-    target_os = "windows",
-    target_os = "linux",
-    target_os = "freebsd",
-    target_os = "dragonfly",
-    target_os = "netbsd",
-    target_os = "openbsd",
-    target_arch = "wasm32"
-)))]
-mod platform {
-    pub fn detect() -> crate::Mode {
-        super::Mode::Light
-    }
-}
-
-mod rgb;
-use rgb::Rgb;
+mod utils;
+use utils::rgb::Rgb;
 
 /// Enum representing dark mode, light mode, or unspecified.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -99,12 +53,9 @@ impl Mode {
     }
 }
 
+pub use platform::notify::ThemeWatcher;
+
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
 pub fn detect() -> Mode {
     platform::detect::detect()
-}
-
-/// Watch for changes in light mode or dark mode. If the mode can’t be detected, fall back to [`Mode::Default`].
-pub async fn notify(action: fn(mode: Mode)) -> anyhow::Result<()> {
-    platform::notify::notify(action).await
 }

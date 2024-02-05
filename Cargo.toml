@@ -11,6 +11,7 @@ build = "build.rs"
 
 [dependencies]
 anyhow = "1.0.52"
+tokio = "1.23.0"
 
 [dev-dependencies]
 tokio = { version = "1.23.0", features = ["full"] }
@@ -30,4 +31,4 @@ winreg = "0.10"
 objc = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-web-sys = { version = "0.3", features = [ "MediaQueryList", "Window" ] }
+web-sys = { version = "0.3", features = ["MediaQueryList", "Window"] }
