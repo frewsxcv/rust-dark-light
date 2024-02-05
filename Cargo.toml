@@ -20,12 +20,12 @@ tokio = { version = "1.23.0", features = ["full"] }
 detect-desktop-environment = "1.0.0"
 dconf_rs = "0.3"
 zbus = "3.0"
-rust-ini = "0.19"
-ashpd = "0.6.0"
+rust-ini = "0.20"
+ashpd = "0.7.0"
 xdg = "2.4.1"
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.10"
+winreg = "0.52.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"

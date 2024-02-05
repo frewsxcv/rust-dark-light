@@ -1,6 +1,9 @@
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 
-use tokio::sync::{broadcast, Mutex};
+use tokio::{
+    sync::{broadcast, Mutex},
+    time::Duration,
+};
 
 use crate::{detect, Mode};
 
