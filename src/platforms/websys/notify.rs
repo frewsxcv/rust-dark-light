@@ -44,6 +44,23 @@ impl ThemeWatcher {
 
     /// The asynchronous method to monitor theme changes
     async fn monitor_theme_changes(&self) {
-        todo!("Implement theme monitoring for websys")
+        loop {
+            // Get the current value of the registry key
+            let current_value = detect();
+
+            // Compare the current value with the stored value
+            let mut current_mode = self.current_mode.lock().await;
+
+            if current_value != *current_mode {
+                // Update the current mode
+                *current_mode = current_value;
+
+                // Notify subscribers about the theme change
+                let _ = self.sender.send(current_mode.clone());
+            }
+
+            // Sleep for a specified interval before checking again
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
     }
 }

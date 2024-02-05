@@ -1,15 +1,8 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use tokio::sync::{broadcast, Mutex};
-use winreg::{
-    enums::{HKEY_CURRENT_USER, KEY_READ},
-    RegKey,
-};
 
-use crate::Mode;
-
-use super::detect::detect;
-const TIMEOUT: std::time::Duration = std::time::Duration::from_millis(100);
+use crate::{detect, Mode};
 
 pub struct ThemeWatcher {
     sender: broadcast::Sender<Mode>,
@@ -52,39 +45,23 @@ impl ThemeWatcher {
 
     // The asynchronous method to monitor theme changes
     async fn monitor_theme_changes(&self) {
-        // Specify the registry key path you want to monitor
-        let key_path = r"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
-
-        // Open the registry key with read access
-        let hklm = RegKey::predef(HKEY_CURRENT_USER);
-        let key = hklm
-            .open_subkey_with_flags(key_path, KEY_READ)
-            .expect("Failed to open registry key");
-
         loop {
             // Get the current value of the registry key
-            let current_value = key
-                .get_value::<u32, _>("SystemUsesLightTheme")
-                .expect("Failed to get initial value");
+            let current_value = detect();
 
             // Compare the current value with the stored value
             let mut current_mode = self.current_mode.lock().await;
-            let stored_value = *current_mode;
 
-            if current_value != stored_value as u32 {
+            if current_value != *current_mode {
                 // Update the current mode
-                *current_mode = if current_value != 0 {
-                    Mode::Light
-                } else {
-                    Mode::Dark
-                };
+                *current_mode = current_value;
 
                 // Notify subscribers about the theme change
                 let _ = self.sender.send(current_mode.clone());
             }
 
             // Sleep for a specified interval before checking again
-            tokio::time::sleep(TIMEOUT).await;
+            tokio::time::sleep(Duration::from_millis(100)).await;
         }
     }
 }
