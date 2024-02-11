@@ -2,19 +2,20 @@ use std::task::Poll;
 
 use futures::{stream, Stream};
 
-use crate::{detect, platforms::Event, Mode};
+use crate::{detect, Mode};
 
-pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Event<Mode>> + Send> {
+pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
     let mut last_mode = detect();
 
-    let stream = stream::poll_fn(move |_| -> Poll<Option<Event<Mode>>> {
+    let stream = stream::poll_fn(move |ctx| -> Poll<Option<Mode>> {
         let current_mode = detect();
 
         if current_mode != last_mode {
             last_mode = current_mode;
-            Poll::Ready(Some(Event::ThemeChanged(current_mode)))
+            Poll::Ready(Some(current_mode))
         } else {
-            Poll::Ready(Some(Event::Waiting))
+            ctx.waker().wake_by_ref();
+            Poll::Pending
         }
     });
 
