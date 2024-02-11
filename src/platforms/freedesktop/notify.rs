@@ -2,28 +2,26 @@ use ashpd::desktop::settings::{ColorScheme, Settings};
 use futures::{stream, Stream, StreamExt};
 use std::task::Poll;
 
-use crate::{detect, platforms::Event, Mode};
+use crate::{detect, Mode};
 
-pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Event<Mode>> + Send> {
-    let mut last_mode = detect();
-
+pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
     let stream = if get_freedesktop_color_scheme().await.is_ok() {
         let proxy = Settings::new().await?;
         proxy
             .receive_color_scheme_changed()
             .await?
             .map(Mode::from)
-            .map(|mode| Event::ThemeChanged(mode))
             .boxed()
     } else {
-        stream::poll_fn(move |_| -> Poll<Option<Event<Mode>>> {
+        let mut last_mode = detect();
+        stream::poll_fn(move |ctx| -> Poll<Option<Mode>> {
             let current_mode = detect();
-
             if current_mode != last_mode {
                 last_mode = current_mode;
-                Poll::Ready(Some(Event::ThemeChanged(current_mode)))
+                Poll::Ready(Some(current_mode))
             } else {
-                Poll::Ready(Some(Event::Waiting))
+                ctx.waker().wake_by_ref();
+                Poll::Pending
             }
         })
         .boxed()

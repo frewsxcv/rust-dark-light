@@ -2,7 +2,7 @@ use detect_desktop_environment::DesktopEnvironment;
 
 use crate::Mode;
 
-use super::{kde_detect, dconf_detect, CINNAMON, GNOME, MATE};
+use super::{dconf_detect, kde_detect, CINNAMON, GNOME, MATE};
 
 pub fn detect() -> Mode {
     NonFreeDesktop::detect()
@@ -29,7 +29,7 @@ impl ColorScheme for FreeDesktop {
 /// Detects the color scheme on non FreeDesktop platforms, having a custom implementation for each desktop environment.
 impl ColorScheme for NonFreeDesktop {
     fn detect() -> Mode {
-        let mode = match DesktopEnvironment::detect() {
+        match DesktopEnvironment::detect() {
             Some(mode) => match mode {
                 DesktopEnvironment::Kde => match kde_detect() {
                     Ok(mode) => mode,
@@ -42,7 +42,6 @@ impl ColorScheme for NonFreeDesktop {
                 _ => Mode::Default,
             },
             None => Mode::Default,
-        };
-        mode
+        }
     }
 }

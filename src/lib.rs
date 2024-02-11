@@ -40,6 +40,7 @@ pub enum Mode {
 }
 
 impl Mode {
+    #[allow(dead_code)]
     fn from_bool(b: bool) -> Self {
         if b {
             Mode::Dark
@@ -70,4 +71,3 @@ impl Mode {
 pub use platform::detect::detect;
 /// Notifies the user if the system theme has been changed.
 pub use platform::notify::subscribe;
-pub use platforms::Event;
