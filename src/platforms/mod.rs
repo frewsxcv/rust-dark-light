@@ -46,3 +46,9 @@ pub mod platform {
         super::Mode::Light
     }
 }
+
+#[derive(Debug)]
+pub enum Event<T> {
+    ThemeChanged(T),
+    Waiting,
+}
