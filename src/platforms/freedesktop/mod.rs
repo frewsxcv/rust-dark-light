@@ -14,7 +14,13 @@ const CINNAMON: &str = "/org/cinnamon/desktop/interface/gtk-theme";
 
 fn dconf_detect(path: &str) -> Mode {
     match dconf_rs::get_string(path) {
-        Ok(theme) => Mode::from(theme.to_lowercase().contains("dark")),
+        Ok(theme) => {
+            if theme.to_lowercase().contains("dark") {
+                Mode::Dark
+            } else {
+                Mode::Light
+            }
+        }
         Err(_) => Mode::Default,
     }
 }
@@ -31,6 +37,16 @@ fn kde_detect() -> anyhow::Result<Mode> {
     let background = properties
         .get("BackgroundNormal")
         .context("Failed to get BackgroundNormal inside Colors:Window")?;
-    let rgb = Rgb::from_str(background)?;
+    let rgb = Rgb::from_str(background).unwrap();
     Ok(Mode::from_rgb(rgb))
+}
+
+impl From<ashpd::desktop::settings::ColorScheme> for Mode {
+    fn from(value: ashpd::desktop::settings::ColorScheme) -> Self {
+        match value {
+            ashpd::desktop::settings::ColorScheme::NoPreference => Mode::Default,
+            ashpd::desktop::settings::ColorScheme::PreferDark => Mode::Dark,
+            ashpd::desktop::settings::ColorScheme::PreferLight => Mode::Light,
+        }
+    }
 }

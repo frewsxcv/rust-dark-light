@@ -40,9 +40,8 @@ pub enum Mode {
 }
 
 impl Mode {
-    /// Convert a boolean to [`Mode`]. `true` is [`Mode::Dark`], `false` is [`Mode::Light`].
-    fn from(mode: bool) -> Self {
-        if mode {
+    fn from_bool(b: bool) -> Self {
+        if b {
             Mode::Dark
         } else {
             Mode::Light
@@ -67,9 +66,8 @@ impl Mode {
     }
 }
 
-pub use platform::notify::ThemeWatcher;
-
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
-pub fn detect() -> Mode {
-    platform::detect::detect()
-}
+pub use platform::detect::detect;
+/// Notifies the user if the system theme has been changed.
+pub use platform::notify::subscribe;
+pub use platforms::Event;

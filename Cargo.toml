@@ -10,8 +10,8 @@ readme = "README.md"
 build = "build.rs"
 
 [dependencies]
-anyhow = "1.0.52"
-tokio = "1.23.0"
+futures = "0.3.30"
+anyhow = "1.0.79"
 
 [dev-dependencies]
 tokio = { version = "1.23.0", features = ["full"] }
