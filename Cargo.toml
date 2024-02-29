@@ -13,7 +13,7 @@ build = "build.rs"
 detect-desktop-environment = "0.2"
 dconf_rs = "0.3"
 dirs = "4.0"
-zbus = "3.0"
+zbus = "4.0"
 zvariant = "3.6"
 rust-ini = "0.18"
 
