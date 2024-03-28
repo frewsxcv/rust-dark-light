@@ -21,11 +21,11 @@ fn get_freedesktop_color_scheme() -> Option<Mode> {
         &("org.freedesktop.appearance", "color-scheme"),
     );
     if let Ok(reply) = &reply {
-        let theme = reply.body::<Value>();
+        let theme = reply.body().deserialize::<u32>();
         if theme.is_err() {
             return None;
         }
-        let theme = theme.unwrap().downcast::<u32>();
+    
         match theme.unwrap() {
             1 => Some(Mode::Dark),
             2 => Some(Mode::Light),
