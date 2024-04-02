@@ -2,7 +2,6 @@ use detect_desktop_environment::DesktopEnvironment;
 use ini::Ini;
 use std::path::{Path, PathBuf};
 use zbus::blocking::Connection;
-use zvariant::Value;
 
 use crate::Mode;
 
