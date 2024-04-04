@@ -14,7 +14,6 @@ detect-desktop-environment = "0.2"
 dconf_rs = "0.3"
 dirs = "4.0"
 zbus = "4.1.2"
-zvariant = "3.6"
 rust-ini = "0.18"
 
 [target.'cfg(windows)'.dependencies]
