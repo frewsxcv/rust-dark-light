@@ -15,16 +15,10 @@
 //! }
 //! ```
 
-#[cfg(target_os = "macos")]
-mod macos;
-#[cfg(target_os = "macos")]
-use macos as platform;
+mod platforms;
+use platforms::platform;
 
-#[cfg(target_os = "windows")]
-mod windows;
-#[cfg(target_os = "windows")]
-use windows as platform;
-
+mod utils;
 #[cfg(any(
     target_os = "linux",
     target_os = "freebsd",
@@ -32,37 +26,9 @@ use windows as platform;
     target_os = "netbsd",
     target_os = "openbsd"
 ))]
-mod freedesktop;
-#[cfg(any(
-    target_os = "linux",
-    target_os = "freebsd",
-    target_os = "dragonfly",
-    target_os = "netbsd",
-    target_os = "openbsd"
-))]
-use freedesktop as platform;
+use utils::rgb::Rgb;
 
-#[cfg(target_arch = "wasm32")]
-mod websys;
-#[cfg(target_arch = "wasm32")]
-use websys as platform;
-
-#[cfg(not(any(
-    target_os = "macos",
-    target_os = "windows",
-    target_os = "linux",
-    target_os = "freebsd",
-    target_os = "dragonfly",
-    target_os = "netbsd",
-    target_os = "openbsd",
-    target_arch = "wasm32"
-)))]
-mod platform {
-    pub fn detect() -> crate::Mode {
-        super::Mode::Light
-    }
-}
-
+/// Enum representing dark mode, light mode, or unspecified.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Mode {
     /// Dark mode
@@ -74,15 +40,25 @@ pub enum Mode {
 }
 
 impl Mode {
-    fn from(b: bool) -> Self {
+    #[allow(dead_code)]
+    fn from_bool(b: bool) -> Self {
         if b {
             Mode::Dark
         } else {
             Mode::Light
         }
     }
-    fn rgb(r: u32, g: u32, b: u32) -> Self {
-        let window_background_gray = (r * 11 + g * 16 + b * 5) / 32;
+
+    #[cfg(any(
+        target_os = "linux",
+        target_os = "freebsd",
+        target_os = "dragonfly",
+        target_os = "netbsd",
+        target_os = "openbsd"
+    ))]
+    /// Convert an RGB color to [`Mode`]. The color is converted to grayscale, and if the grayscale value is less than 192, [`Mode::Dark`] is returned. Otherwise, [`Mode::Light`] is returned.
+    fn from_rgb(rgb: Rgb) -> Self {
+        let window_background_gray = (rgb.0 * 11 + rgb.1 * 16 + rgb.2 * 5) / 32;
         if window_background_gray < 192 {
             Self::Dark
         } else {
@@ -92,6 +68,6 @@ impl Mode {
 }
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
-pub fn detect() -> Mode {
-    platform::detect()
-}
+pub use platform::detect::detect;
+/// Notifies the user if the system theme has been changed.
+pub use platform::notify::subscribe;

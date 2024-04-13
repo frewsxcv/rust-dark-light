@@ -9,18 +9,26 @@ description = "Detect if dark mode or light mode is enabled"
 readme = "README.md"
 build = "build.rs"
 
+[dependencies]
+futures = "0.3.30"
+anyhow = "1.0.79"
+
+[dev-dependencies]
+tokio = { version = "1.23.0", features = ["full"] }
+
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
-detect-desktop-environment = "0.2"
+detect-desktop-environment = "1.0.0"
 dconf_rs = "0.3"
-dirs = "4.0"
-zbus = "4.1.2"
-rust-ini = "0.18"
+zbus = "3.0"
+rust-ini = "0.20"
+ashpd = "0.7.0"
+xdg = "2.4.1"
 
 [target.'cfg(windows)'.dependencies]
-winreg = "0.10"
+winreg = "0.52.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-web-sys = { version = "0.3", features = [ "MediaQueryList", "Window" ] }
+web-sys = { version = "0.3", features = ["MediaQueryList", "Window"] }
