@@ -28,7 +28,17 @@ xdg = "2.4.1"
 winreg = "0.52.0"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-objc = "0.2"
+objc2 = "0.5.1"
+objc2-foundation = { version = "0.2.0", features = [
+    "NSArray",
+    "NSObject",
+    "NSString",
+] }
+objc2-app-kit = { version = "0.2.0", features = [
+    "NSAppearance",
+    "NSApplication",
+    "NSResponder",
+] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web-sys = { version = "0.3", features = ["MediaQueryList", "Window"] }
