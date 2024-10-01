@@ -43,6 +43,6 @@ pub use websys as platform;
 )))]
 pub mod platform {
     pub fn detect() -> crate::Mode {
-        super::Mode::Light
+        super::Mode::NoPreference
     }
 }
