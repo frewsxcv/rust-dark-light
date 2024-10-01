@@ -11,18 +11,18 @@ build = "build.rs"
 
 [dependencies]
 futures = "0.3.30"
-anyhow = "1.0.79"
+anyhow = "1.0.89"
 
 [dev-dependencies]
-tokio = { version = "1.23.0", features = ["full"] }
+tokio = { version = "1.40.0", features = ["full"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 detect-desktop-environment = "1.1.0"
 dconf_rs = "0.3"
-zbus = "3.0"
-rust-ini = "0.20"
-ashpd = "0.7.0"
-xdg = "2.4.1"
+zbus = "4.4"
+rust-ini = "0.21"
+ashpd = "0.9"
+xdg = "2.5"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
