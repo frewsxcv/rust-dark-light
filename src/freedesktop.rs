@@ -24,7 +24,7 @@ fn get_freedesktop_color_scheme() -> Option<Mode> {
         if theme.is_err() {
             return None;
         }
-    
+
         match theme.unwrap() {
             1 => Some(Mode::Dark),
             2 => Some(Mode::Light),
@@ -86,7 +86,7 @@ pub fn detect() -> Mode {
             DesktopEnvironment::Gnome => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
             DesktopEnvironment::Mate => detect_gtk("/org/mate/desktop/interface/gtk-theme"),
             DesktopEnvironment::Unity => detect_gtk("/org/gnome/desktop/interface/gtk-theme"),
-            _ => Mode::Default,
+            _ => Mode::NoPreference,
         },
     }
 }

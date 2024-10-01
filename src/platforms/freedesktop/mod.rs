@@ -21,7 +21,7 @@ fn dconf_detect(path: &str) -> Mode {
                 Mode::Light
             }
         }
-        Err(_) => Mode::Default,
+        Err(_) => Mode::NoPreference,
     }
 }
 
@@ -41,10 +41,11 @@ fn kde_detect() -> anyhow::Result<Mode> {
     Ok(Mode::from_rgb(rgb))
 }
 
+#[cfg(feature = "zbus")]
 impl From<ashpd::desktop::settings::ColorScheme> for Mode {
     fn from(value: ashpd::desktop::settings::ColorScheme) -> Self {
         match value {
-            ashpd::desktop::settings::ColorScheme::NoPreference => Mode::Default,
+            ashpd::desktop::settings::ColorScheme::NoPreference => Mode::NoPreference,
             ashpd::desktop::settings::ColorScheme::PreferDark => Mode::Dark,
             ashpd::desktop::settings::ColorScheme::PreferLight => Mode::Light,
         }

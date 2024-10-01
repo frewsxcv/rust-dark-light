@@ -1,4 +1,3 @@
-use ashpd::desktop::settings::{ColorScheme, Settings};
 use futures::{stream, Stream, StreamExt};
 use std::task::Poll;
 
@@ -6,7 +5,7 @@ use crate::{detect, Mode};
 
 pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
     let stream = if get_freedesktop_color_scheme().await.is_ok() {
-        let proxy = Settings::new().await?;
+        let proxy = ashpd::desktop::Settings::new().await?;
         proxy
             .receive_color_scheme_changed()
             .await?
@@ -31,12 +30,8 @@ pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
 }
 
 async fn get_freedesktop_color_scheme() -> anyhow::Result<Mode> {
-    let proxy = Settings::new().await?;
+    let proxy = ashpd::desktop::Settings::new().await?;
     let color_scheme = proxy.color_scheme().await?;
-    let mode = match color_scheme {
-        ColorScheme::PreferDark => Mode::Dark,
-        ColorScheme::PreferLight => Mode::Light,
-        ColorScheme::NoPreference => Mode::Default,
-    };
+    let mode = color_scheme.into();
     Ok(mode)
 }

@@ -11,7 +11,7 @@
 //!     // Light mode
 //!     dark_light::Mode::Light => {},
 //!     // Unspecified
-//!     dark_light::Mode::Default => {},
+//!     dark_light::Mode::NoPreference => {},
 //! }
 //! ```
 
@@ -36,7 +36,7 @@ pub enum Mode {
     /// Light mode
     Light,
     /// Unspecified
-    Default,
+    NoPreference,
 }
 
 impl Mode {
@@ -67,7 +67,7 @@ impl Mode {
     }
 }
 
-/// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
+/// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::NoPreference`].
 pub use platform::detect::detect;
 /// Notifies the user if the system theme has been changed.
 pub use platform::notify::subscribe;

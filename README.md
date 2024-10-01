@@ -16,7 +16,7 @@ fn main() {
         // Light mode
         dark_light::Mode::Light => {},
         // Unspecified
-        dark_light::Mode::Default => {},
+        dark_light::Mode::NoPreference => {},
     }
 }
 ```
@@ -35,5 +35,3 @@ Licensed under either of
  * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
-
-
