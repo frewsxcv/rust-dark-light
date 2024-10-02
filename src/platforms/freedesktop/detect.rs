@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use detect_desktop_environment::DesktopEnvironment;
 
 use crate::Mode;
@@ -6,6 +8,8 @@ use super::{dconf_detect, kde_detect, CINNAMON, GNOME, MATE};
 
 pub fn detect() -> Mode {
     NonFreeDesktop::detect()
+        .concrete()
+        .unwrap_or_else(FreeDesktop::detect)
 }
 
 /// Detects the color scheme on a platform.
@@ -22,7 +26,34 @@ struct NonFreeDesktop;
 /// Detects the color scheme on FreeDesktop platforms. It makes use of the DBus interface.
 impl ColorScheme for FreeDesktop {
     fn detect() -> Mode {
-        todo!()
+        let Ok(output) = Command::new("dbus-send")
+            .args([
+                "--print-reply=literal",
+                "--dest=org.freedesktop.portal.Desktop",
+                "/org/freedesktop/portal/desktop",
+                "org.freedesktop.portal.Settings.Read",
+                "string:org.freedesktop.appearance",
+                "string:color-scheme",
+            ])
+            .output()
+            .map(|output| output.stdout)
+        else {
+            return Mode::NoPreference;
+        };
+        const PREFIX: &[u8] = b"uint32 ";
+        if let Some(index) = output
+            .windows(PREFIX.len())
+            .position(|bytes| bytes == PREFIX)
+        {
+            match output.get(index + PREFIX.len()) {
+                Some(b'0') => Mode::NoPreference,
+                Some(b'1') => Mode::Dark,
+                Some(b'2') => Mode::Light,
+                _ => Mode::NoPreference,
+            }
+        } else {
+            Mode::NoPreference
+        }
     }
 }
 

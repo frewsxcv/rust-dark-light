@@ -65,6 +65,14 @@ impl Mode {
             Self::Light
         }
     }
+
+    fn concrete(self) -> Option<Self> {
+        match self {
+            Mode::Dark => Some(Mode::Dark),
+            Mode::Light => Some(Mode::Light),
+            Mode::NoPreference => None,
+        }
+    }
 }
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::NoPreference`].

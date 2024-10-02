@@ -21,6 +21,9 @@ fn main() {
 }
 ```
 
+On platforms which make use of xdg-desktop-portals, by default this crate uses the `dbus-send` and `dbus-monitor` commands to avoid heavy dependencies.
+If you already depend on `zbus` or `ashpd`, you should enable the `zbus` feature.
+
 ## Example
 
 ```

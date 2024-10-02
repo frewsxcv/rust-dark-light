@@ -19,9 +19,9 @@ tokio = { version = "1.40.0", features = ["full"] }
 [target.'cfg(any(target_os = "linux", target_os = "freebsd", target_os = "dragonfly", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 detect-desktop-environment = "1.1.0"
 dconf_rs = "0.3"
-zbus = "4.4"
+zbus = { version = "4.4", optional = true }
+ashpd = { version = "0.9", optional = true }
 rust-ini = "0.21"
-ashpd = "0.9"
 xdg = "2.5"
 
 [target.'cfg(windows)'.dependencies]
@@ -32,3 +32,6 @@ objc = "0.2"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 web-sys = { version = "0.3", features = ["MediaQueryList", "Window"] }
+
+[features]
+zbus = ["dep:zbus", "dep:ashpd"]
