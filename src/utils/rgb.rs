@@ -3,8 +3,10 @@ use std::str::FromStr;
 /// Struct representing an RGB color
 pub(crate) struct Rgb(pub(crate) u32, pub(crate) u32, pub(crate) u32);
 
+pub struct ParseError;
+
 impl FromStr for Rgb {
-    type Err = anyhow::Error;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let rgb = s
@@ -15,7 +17,7 @@ impl FromStr for Rgb {
                     acc.push(x);
                     Ok(acc)
                 } else {
-                    Err(anyhow::anyhow!("RGB format is invalid"))
+                    Err(ParseError)
                 }
             })?;
         Ok(Rgb(rgb[0], rgb[1], rgb[2]))

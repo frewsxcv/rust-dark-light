@@ -16,6 +16,7 @@
 //! ```
 
 mod platforms;
+
 use platforms::platform;
 
 mod utils;
@@ -29,13 +30,14 @@ mod utils;
 use utils::rgb::Rgb;
 
 /// Enum representing dark mode, light mode, or unspecified.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Default)]
 pub enum Mode {
     /// Dark mode
     Dark,
     /// Light mode
     Light,
     /// Unspecified
+    #[default]
     NoPreference,
 }
 

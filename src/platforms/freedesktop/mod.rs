@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use anyhow::Context;
 use ini::Ini;
 
 use crate::{utils::rgb::Rgb, Mode};
@@ -25,20 +24,17 @@ fn dconf_detect(path: &str) -> Mode {
     }
 }
 
-fn kde_detect() -> anyhow::Result<Mode> {
-    let xdg = xdg::BaseDirectories::new()?;
-    let path = xdg
-        .find_config_file("kdeglobals")
-        .context("Path not found")?;
-    let cfg = Ini::load_from_file(path)?;
-    let properties = cfg
-        .section(Some("Colors:Window"))
-        .context("Failed to get section Colors:Window")?;
-    let background = properties
-        .get("BackgroundNormal")
-        .context("Failed to get BackgroundNormal inside Colors:Window")?;
-    let rgb = Rgb::from_str(background).unwrap();
-    Ok(Mode::from_rgb(rgb))
+fn kde_detect() -> Mode {
+    fn kde_detect() -> Option<Mode> {
+        let xdg = xdg::BaseDirectories::new().ok()?;
+        let path = xdg.find_config_file("kdeglobals")?;
+        let cfg = Ini::load_from_file(path).ok()?;
+        let properties = cfg.section(Some("Colors:Window"))?;
+        let background = properties.get("BackgroundNormal")?;
+        let rgb = Rgb::from_str(background).ok()?;
+        Some(Mode::from_rgb(rgb))
+    }
+    kde_detect().unwrap_or_default()
 }
 
 #[cfg(feature = "zbus")]

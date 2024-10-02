@@ -1,8 +1,9 @@
 use crate::Mode;
 use futures::Stream;
+use std::error::Error;
 
 #[cfg(not(feature = "zbus"))]
-pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
+pub async fn subscribe() -> Result<impl Stream<Item = Mode> + Send, Box<dyn Error>> {
     use futures::stream;
     use std::{
         io::{BufRead, BufReader},
@@ -20,8 +21,7 @@ pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
         )
         .stdout(Stdio::piped())
         .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
+        .spawn()?;
     let stdout = process.stdout.take().unwrap();
     let lines = BufReader::new(stdout).lines();
     Ok(stream::iter(lines.filter_map(
@@ -35,7 +35,7 @@ pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
 }
 
 #[cfg(feature = "zbus")]
-pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
+pub async fn subscribe() -> Result<impl Stream<Item = Mode> + Send, Box<dyn Error>> {
     use crate::detect;
     use futures::{stream, StreamExt};
     use std::task::Poll;
@@ -65,7 +65,7 @@ pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
 }
 
 #[cfg(feature = "zbus")]
-async fn get_freedesktop_color_scheme() -> anyhow::Result<Mode> {
+async fn get_freedesktop_color_scheme() -> Result<Mode, Box<dyn Error>> {
     let proxy = ashpd::desktop::settings::Settings::new().await?;
     let color_scheme = proxy.color_scheme().await?;
     let mode = color_scheme.into();

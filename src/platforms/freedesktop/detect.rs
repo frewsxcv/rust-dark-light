@@ -62,10 +62,7 @@ impl ColorScheme for NonFreeDesktop {
     fn detect() -> Mode {
         match DesktopEnvironment::detect() {
             Some(mode) => match mode {
-                DesktopEnvironment::Kde => match kde_detect() {
-                    Ok(mode) => mode,
-                    Err(_) => Mode::NoPreference,
-                },
+                DesktopEnvironment::Kde => kde_detect(),
                 DesktopEnvironment::Cinnamon => dconf_detect(CINNAMON),
                 DesktopEnvironment::Gnome => dconf_detect(GNOME),
                 DesktopEnvironment::Mate => dconf_detect(MATE),
