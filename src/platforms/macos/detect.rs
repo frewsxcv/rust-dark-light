@@ -2,52 +2,43 @@
 // Written with help from Ryan McGrath (https://rymc.io/).
 
 use crate::Mode;
-use objc::runtime::Object;
-use objc::{class, msg_send, sel, sel_impl};
 
-extern "C" {
-    static NSAppearanceNameAqua: *const Object;
-    static NSAppearanceNameAccessibilityHighContrastAqua: *const Object;
-    static NSAppearanceNameDarkAqua: *const Object;
-    static NSAppearanceNameAccessibilityHighContrastDarkAqua: *const Object;
-}
+use objc2::sel;
+use objc2_app_kit::{
+    NSAppearance, NSAppearanceNameAccessibilityHighContrastAqua,
+    NSAppearanceNameAccessibilityHighContrastDarkAqua, NSAppearanceNameAqua,
+    NSAppearanceNameDarkAqua, NSApplication,
+};
+use objc2_foundation::{MainThreadMarker, NSArray, NSCopying, NSObjectProtocol};
 
 fn is_dark_mode_enabled() -> bool {
-    unsafe {
-        let mut appearance: *const Object = msg_send![class!(NSAppearance), currentAppearance];
-        if appearance.is_null() {
-            appearance = msg_send![class!(NSApp), effectiveAppearance];
-        }
+    // SAFETY: TODO, only perform this function on the main thread.
+    let mtm = unsafe { MainThreadMarker::new_unchecked() };
 
-        let objects = [
-            NSAppearanceNameAqua,
-            NSAppearanceNameAccessibilityHighContrastAqua,
-            NSAppearanceNameDarkAqua,
-            NSAppearanceNameAccessibilityHighContrastDarkAqua,
-        ];
-        let names: *const Object = msg_send![
-            class!(NSArray),
-            arrayWithObjects:objects.as_ptr()
-            count:objects.len()
-        ];
+    unsafe {
+        #[allow(deprecated)]
+        let appearance = NSAppearance::currentAppearance()
+            .unwrap_or_else(|| NSApplication::sharedApplication(mtm).effectiveAppearance());
+
+        let names = NSArray::from_id_slice(&[
+            NSAppearanceNameAqua.copy(),
+            NSAppearanceNameAccessibilityHighContrastAqua.copy(),
+            NSAppearanceNameDarkAqua.copy(),
+            NSAppearanceNameAccessibilityHighContrastDarkAqua.copy(),
+        ]);
 
         // `bestMatchFromAppearancesWithNames` is only available in macOS 10.14+.
         // Gracefully handle earlier versions.
-        let responds_to_selector: objc::runtime::BOOL = msg_send![
-            appearance,
-            respondsToSelector: sel!(bestMatchFromAppearancesWithNames:)
-        ];
-        if responds_to_selector == objc::runtime::NO {
+        if !appearance.respondsToSelector(sel!(bestMatchFromAppearancesWithNames:)) {
             return false;
         }
 
-        let style: *const Object = msg_send![
-            appearance,
-            bestMatchFromAppearancesWithNames:&*names
-        ];
-
-        style == NSAppearanceNameDarkAqua
-            || style == NSAppearanceNameAccessibilityHighContrastDarkAqua
+        if let Some(style) = appearance.bestMatchFromAppearancesWithNames(&names) {
+            *style == *NSAppearanceNameDarkAqua
+                || *style == *NSAppearanceNameAccessibilityHighContrastDarkAqua
+        } else {
+            false
+        }
     }
 }
 
