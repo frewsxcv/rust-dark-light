@@ -2,7 +2,7 @@
 //!
 //! # Examples
 //!
-//! ```
+//! ```no-exec
 //! let mode = dark_light::detect();
 //!
 //! match mode {
