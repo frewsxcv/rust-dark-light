@@ -2,7 +2,8 @@ use futures::StreamExt;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    while let Some(mode) = dark_light::subscribe().await?.next().await {
+    let mut stream = dark_light::subscribe().await?;
+    while let Some(mode) = stream.next().await {
         println!("System theme changed: {:?}", mode);
     }
 
