@@ -16,12 +16,16 @@ impl From<PortalColorScheme> for Mode {
     }
 }
 
-pub(crate) async fn initial_value() -> Mode {
-    XdgPortalSettings::new()
-        .await
-        .unwrap()
-        .color_scheme()
-        .await
-        .unwrap()
-        .into()
+pub(crate) async fn get_color_scheme() -> Mode {
+    let Ok(settings) = XdgPortalSettings::new().await else {
+        log::error!("Failed to create a new portal settings instance.");
+        return Mode::Default;
+    };
+
+    let Ok(color_scheme) = settings.color_scheme().await else {
+        log::error!("Failed to get the current color scheme, defaulting to Mode::Default.");
+        return Mode::Default;
+    };
+
+    color_scheme.into()
 }
