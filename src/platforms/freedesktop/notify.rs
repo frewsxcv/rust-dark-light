@@ -1,13 +1,15 @@
 use ashpd::desktop::settings::Settings;
-use futures::{Stream, StreamExt};
+use futures::{stream, Stream, StreamExt};
 
 use crate::Mode;
 
 pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
-    Ok(Settings::new()
+    let initial = stream::once(super::initial_value()).boxed();
+    let later_updates = Settings::new()
         .await?
         .receive_color_scheme_changed()
         .await?
         .map(Mode::from)
-        .boxed())
+        .boxed();
+    Ok(initial.chain(later_updates))
 }
