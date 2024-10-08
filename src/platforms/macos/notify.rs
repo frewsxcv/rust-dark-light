@@ -1,10 +1,11 @@
 use std::task::Poll;
+use std::error::Error;
 
 use futures::{stream, Stream};
 
 use crate::{detect, Mode};
 
-pub async fn subscribe() -> anyhow::Result<impl Stream<Item = Mode> + Send> {
+pub async fn subscribe() -> Result<impl Stream<Item = Mode> + Send, Box<dyn Error>> {
     let mut last_mode = detect();
 
     let stream = stream::poll_fn(move |ctx| -> Poll<Option<Mode>> {
