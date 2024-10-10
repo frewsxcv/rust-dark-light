@@ -23,7 +23,7 @@ pub(crate) async fn get_color_scheme() -> Mode {
     };
 
     let Ok(color_scheme) = settings.color_scheme().await else {
-        log::error!("Failed to get the current color scheme, defaulting to Mode::Default.");
+        log::error!("Failed to get the current color scheme from XDG Desktop Portal, defaulting to Mode::Default.");
         return Mode::Default;
     };
 
