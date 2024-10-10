@@ -18,7 +18,7 @@ impl From<PortalColorScheme> for Mode {
 
 pub(crate) async fn get_color_scheme() -> Mode {
     let Ok(settings) = XdgPortalSettings::new().await else {
-        log::error!("Failed to create a new portal settings instance.");
+        log::error!("Failed to create a new XDG Desktop Portal settings instance.");
         return Mode::Default;
     };
 
