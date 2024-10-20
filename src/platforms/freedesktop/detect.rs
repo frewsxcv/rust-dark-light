@@ -3,7 +3,7 @@ pub mod sync {
     use crate::Mode;
 
     pub fn detect() -> Mode {
-        pollster::block_on(super::super::get_color_scheme())
+        futures_lite::future::block_on(super::super::get_color_scheme())
     }
 }
 
