@@ -38,7 +38,7 @@ pub use platforms::platform::detect::detect;
 ///
 /// ``` no_run
 /// use dark_light::Mode;
-/// use futures::stream::StreamExt;
+/// use futures_lite::stream::StreamExt;
 ///
 /// #[tokio::main]
 /// async fn main() {
@@ -66,7 +66,7 @@ pub mod sync {
     ///
     /// ``` no_run
     /// use dark_light::Mode;
-    ///     
+    ///
     /// let mode = dark_light::sync::detect();
     ///
     /// match mode {

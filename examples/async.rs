@@ -1,4 +1,4 @@
-use futures::StreamExt;
+use futures_lite::StreamExt;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

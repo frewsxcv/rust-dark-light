@@ -21,8 +21,8 @@ pub(crate) mod sync {
     }
 }
 
-pub async fn subscribe() -> impl futures::Stream<Item = crate::Mode> {
-    Box::pin(futures::stream::unfold(
+pub async fn subscribe() -> impl futures_lite::Stream<Item = crate::Mode> {
+    Box::pin(futures_lite::stream::unfold(
         crate::detect().await,
         |last_mode| async move {
             loop {
