@@ -5,6 +5,8 @@ pub fn subscribe() -> std::sync::mpsc::Receiver<Mode> {
     let (tx, rx) = std::sync::mpsc::channel();
     let mut last_mode = crate::detect();
 
+    tx.send(last_mode).unwrap();
+
     std::thread::spawn(move || loop {
         let current_mode = crate::detect();
 
