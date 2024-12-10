@@ -23,4 +23,4 @@ pub use mode::Mode;
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
 pub use platforms::platform::detect::detect;
 /// Notifies the user if the system theme has been changed.
-pub use platforms::platform::notify::subscribe;
+pub use platforms::platform::subscribe::subscribe;

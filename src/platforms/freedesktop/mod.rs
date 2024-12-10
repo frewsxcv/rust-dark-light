@@ -1,5 +1,7 @@
 pub mod detect;
-pub mod notify;
+
+#[cfg(not(feature = "sync"))]
+pub mod subscribe;
 
 use crate::Mode;
 
