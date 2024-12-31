@@ -15,32 +15,12 @@
 //! }
 //! ```
 
+mod mode;
 mod platforms;
-use platforms::platform;
 
-/// Enum representing dark mode, light mode, or unspecified.
-#[derive(Copy, Clone, PartialEq, Eq, Debug)]
-pub enum Mode {
-    /// Dark mode
-    Dark,
-    /// Light mode
-    Light,
-    /// Unspecified
-    Default,
-}
-
-impl Mode {
-    #[allow(dead_code)]
-    fn from_bool(b: bool) -> Self {
-        if b {
-            Mode::Dark
-        } else {
-            Mode::Light
-        }
-    }
-}
+pub use mode::Mode;
 
 /// Detect if light mode or dark mode is enabled. If the mode can’t be detected, fall back to [`Mode::Default`].
-pub use platform::detect::detect;
+pub use platforms::platform::detect::detect;
 /// Notifies the user if the system theme has been changed.
-pub use platform::notify::subscribe;
+pub use platforms::platform::subscribe::subscribe;

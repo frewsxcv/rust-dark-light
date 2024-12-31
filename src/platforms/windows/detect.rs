@@ -4,7 +4,7 @@ use winreg::RegKey;
 const SUBKEY: &str = "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
 const VALUE: &str = "AppsUseLightTheme";
 
-pub fn detect() -> Mode {
+pub fn detect_mode() -> Mode {
     let hkcu = RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
     if let Ok(subkey) = hkcu.open_subkey(SUBKEY) {
         if let Ok(dword) = subkey.get_value::<u32, _>(VALUE) {
@@ -12,4 +12,14 @@ pub fn detect() -> Mode {
         }
     }
     Mode::Light
+}
+
+#[cfg(feature = "sync")]
+pub fn detect() -> crate::Mode {
+    detect_mode()
+}
+
+#[cfg(not(feature = "sync"))]
+pub async fn detect() -> crate::Mode {
+    detect_mode()
 }
