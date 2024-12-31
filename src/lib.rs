@@ -3,6 +3,7 @@
 //! It supports macOS, Windows, Linux, BSDs, and WASM.
 //!
 //! On Linux the [XDG Desktop Portal](https://flatpak.github.io/xdg-desktop-portal/) D-Bus API is checked for the `color-scheme` preference, which works in Flatpak sandboxes without needing filesystem access.
+//!
 //! Features:
 //! - [`sync`] - Enables the synchronous API.
 mod mode;
