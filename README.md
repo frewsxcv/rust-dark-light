@@ -64,6 +64,12 @@ Sync
 cargo run --example sync
 ```
 
+## Test
+To test the crate, run the following command:
+```
+cargo test --doc --all-features
+```
+
 ## License
 
 Licensed under either of
