@@ -1,11 +1,14 @@
-use crate::Mode;
+#[cfg(any(feature = "sync", doc))]
+pub mod sync {
+    use crate::Mode;
 
-#[cfg(feature = "sync")]
-pub fn detect() -> Mode {
-    pollster::block_on(super::get_color_scheme())
+    pub fn detect() -> Mode {
+        pollster::block_on(super::super::get_color_scheme())
+    }
 }
 
-#[cfg(not(feature = "sync"))]
+use crate::Mode;
+
 pub async fn detect() -> Mode {
     super::get_color_scheme().await
 }

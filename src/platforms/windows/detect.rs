@@ -14,12 +14,13 @@ pub fn detect_mode() -> Mode {
     Mode::Light
 }
 
-#[cfg(feature = "sync")]
-pub fn detect() -> crate::Mode {
-    detect_mode()
+#[cfg(any(feature = "sync", doc))]
+pub mod sync {
+    pub fn detect() -> crate::Mode {
+        super::detect_mode()
+    }
 }
 
-#[cfg(not(feature = "sync"))]
 pub async fn detect() -> crate::Mode {
     detect_mode()
 }
