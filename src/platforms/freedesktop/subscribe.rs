@@ -5,33 +5,38 @@ use futures::{stream, Stream, StreamExt};
 
 use crate::Mode;
 
-#[cfg(feature = "sync")]
-pub fn subscribe() -> std::sync::mpsc::Receiver<Mode> {
-    let (tx, rx) = std::sync::mpsc::channel();
+#[cfg(any(feature = "sync", doc))]
+pub(crate) mod sync {
+    use super::super::Mode;
+    use super::color_scheme_stream;
+    use futures::StreamExt;
 
-    std::thread::spawn(move || {
-        pollster::block_on(async {
-            let stream = match color_scheme_stream().await {
-                Ok(stream) => stream,
-                Err(err) => {
-                    log::error!("Failed to subscribe to color scheme changes: {}", err);
-                    Box::pin(Box::new(stream::empty()))
-                }
-            };
+    pub fn subscribe() -> std::sync::mpsc::Receiver<Mode> {
+        let (tx, rx) = std::sync::mpsc::channel();
 
-            stream
-                .for_each(|mode| {
-                    let _ = tx.send(mode);
-                    async {}
-                })
-                .await;
+        std::thread::spawn(move || {
+            pollster::block_on(async {
+                let stream = match color_scheme_stream().await {
+                    Ok(stream) => stream,
+                    Err(err) => {
+                        log::error!("Failed to subscribe to color scheme changes: {}", err);
+                        panic!("Failed to subscribe to color scheme changes: {}", err);
+                    }
+                };
+
+                stream
+                    .for_each(|mode| {
+                        let _ = tx.send(mode);
+                        async {}
+                    })
+                    .await;
+            });
         });
-    });
 
-    rx
+        rx
+    }
 }
 
-#[cfg(not(feature = "sync"))]
 pub async fn subscribe() -> impl Stream<Item = Mode> + Send {
     match color_scheme_stream().await {
         Ok(stream) => stream,
