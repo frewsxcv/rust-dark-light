@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::pin::Pin;
 
 use ashpd::desktop::settings::Settings;
 use futures::{stream, Stream, StreamExt};
@@ -33,18 +32,17 @@ pub fn subscribe() -> std::sync::mpsc::Receiver<Mode> {
 }
 
 #[cfg(not(feature = "sync"))]
-pub async fn subscribe() -> Pin<Box<dyn Stream<Item = Mode> + Send>> {
+pub async fn subscribe() -> impl Stream<Item = Mode> + Send {
     match color_scheme_stream().await {
         Ok(stream) => stream,
         Err(err) => {
             log::error!("Failed to subscribe to color scheme changes: {}", err);
-            Box::pin(Box::new(stream::empty()))
+            panic!("Failed to subscribe to color scheme changes: {}", err);
         }
     }
 }
 
-pub async fn color_scheme_stream(
-) -> Result<Pin<Box<dyn Stream<Item = Mode> + Send>>, Box<dyn Error>> {
+pub async fn color_scheme_stream() -> Result<impl Stream<Item = Mode> + Send, Box<dyn Error>> {
     let initial = stream::once(super::get_color_scheme()).boxed();
     let later_updates = Settings::new()
         .await?
@@ -52,5 +50,5 @@ pub async fn color_scheme_stream(
         .await?
         .map(Mode::from)
         .boxed();
-    Ok(Box::pin(Box::new(initial.chain(later_updates))))
+    Ok(Box::pin(initial.chain(later_updates)))
 }
