@@ -21,7 +21,7 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --all-features --verbose
 
   build_wasm:
     runs-on: ubuntu-latest
