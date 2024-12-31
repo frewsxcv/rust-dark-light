@@ -1,6 +1,6 @@
 [package]
 name = "dark-light"
-version = "1.1.1"
+version = "2.0.0"
 authors = ["Corey Farwell <coreyf@rwell.org>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
